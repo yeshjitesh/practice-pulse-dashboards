@@ -8,3 +8,4 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+- Brand logo lives in src/components/brand/Logo.tsx (SVG using theme tokens); favicons/app icons in public/ are rendered from public/favicon.svg — keeps the brand in one place.
