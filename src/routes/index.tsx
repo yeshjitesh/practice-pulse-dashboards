@@ -39,8 +39,8 @@ function Index() {
     setError("");
     const form = e.currentTarget;
     const raw = Object.fromEntries(new FormData(form)) as Record<string, string>;
-    const parsed = schema.safeParse({ ...raw, practice: raw.practice || undefined });
-    if (!parsed.success) return setError(parsed.error.issues[0].message);
+    const parsed = schema.safeParse({ ...raw, practice: raw["practice"] || undefined });
+    if (!parsed.success) return setError(parsed.error.issues[0]?.message ?? "Please check the form");
     setStatus("sending");
     const { error } = await supabase.from("contact_submissions").insert({
       name: parsed.data.name,
