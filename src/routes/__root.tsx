@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "PracticeMD — Practice Management Dashboards" },
-      { name: "theme-color", content: "#0B5D4E" },
+      { name: "theme-color", content: "#1E40AF" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "PracticeMD" },
       { name: "twitter:card", content: "summary_large_image" },
