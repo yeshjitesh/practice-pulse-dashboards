@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { Logo } from "@/components/brand/Logo";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -56,32 +57,35 @@ function Index() {
     setStatus("done");
   }
 
-  const input = "w-full rounded-md border border-input bg-background px-4 py-3 text-foreground outline-none focus:ring-2 focus:ring-ring";
+  const input = "w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-accent focus:ring-2 focus:ring-ring/30";
+  const btn = "inline-block rounded-full bg-primary font-medium text-primary-foreground transition-colors hover:bg-accent";
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-        <span className="font-display text-2xl">Practice<span className="text-primary">MD</span></span>
-        <a href="#contact" className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-foreground hover:opacity-90">Get in touch</a>
+      <header className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <a href="/" aria-label="PracticeMD home"><Logo subtitle iconOnlyOnMobile /></a>
+          <a href="#contact" className={`${btn} px-5 py-2 text-sm`}>Get in touch</a>
+        </div>
       </header>
 
       <section className="mx-auto max-w-6xl px-6 pb-24 pt-16 md:pt-28">
-        <p className="mb-6 text-sm uppercase tracking-[0.2em] text-primary">Practice management dashboards</p>
-        <h1 className="font-display max-w-4xl text-5xl leading-[1.05] md:text-7xl">
-          A dashboard shaped by <em className="text-primary">your</em> practice, not the other way round.
+        <p className="mb-6 text-sm font-medium uppercase tracking-[0.2em] text-accent">Practice management dashboards</p>
+        <h1 className="font-display max-w-4xl text-5xl leading-[1.05] text-primary md:text-7xl">
+          A dashboard shaped by <em className="text-accent">your</em> practice, not the other way round.
         </h1>
         <p className="mt-8 max-w-2xl text-lg text-muted-foreground">
           PracticeMD designs and builds custom practice management dashboards — tailored to the way your team works and the numbers you care about.
         </p>
-        <a href="#contact" className="mt-10 inline-block rounded-full bg-primary px-8 py-4 font-medium text-primary-foreground hover:opacity-90">Tell us what you need</a>
+        <a href="#contact" className={`${btn} mt-10 px-8 py-4`}>Tell us what you need</a>
       </section>
 
       <section className="border-y border-border bg-secondary">
-        <div className="mx-auto grid max-w-6xl gap-10 px-6 py-20 md:grid-cols-3">
+        <div className="mx-auto grid max-w-6xl gap-6 px-6 py-20 md:grid-cols-3">
           {features.map((f, i) => (
-            <div key={f.t}>
-              <span className="font-display text-4xl text-primary">0{i + 1}</span>
-              <h3 className="mt-3 text-xl font-semibold">{f.t}</h3>
+            <div key={f.t} className="rounded-xl border border-border bg-card p-8 shadow-[var(--shadow-soft)]">
+              <span className="font-display text-4xl text-accent">0{i + 1}</span>
+              <h3 className="mt-3 text-xl font-semibold text-primary">{f.t}</h3>
               <p className="mt-2 text-muted-foreground">{f.d}</p>
             </div>
           ))}
@@ -90,30 +94,33 @@ function Index() {
 
       <section id="contact" className="mx-auto grid max-w-6xl gap-12 px-6 py-24 md:grid-cols-2">
         <div>
-          <h2 className="font-display text-4xl md:text-5xl">Let's talk about your practice</h2>
+          <h2 className="font-display text-4xl text-primary md:text-5xl">Let's talk about your practice</h2>
           <p className="mt-4 text-muted-foreground">Share a few details and we'll get back to you to discuss what your dashboard could look like.</p>
         </div>
         {status === "done" ? (
-          <div className="rounded-lg border border-border bg-card p-8">
-            <h3 className="text-xl font-semibold">Thank you!</h3>
+          <div className="rounded-xl border border-border bg-secondary p-8">
+            <h3 className="text-xl font-semibold text-primary">Thank you!</h3>
             <p className="mt-2 text-muted-foreground">Your message has been received.</p>
           </div>
         ) : (
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={onSubmit} className="space-y-4 rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-soft)]">
             <input name="name" placeholder="Your name" maxLength={100} className={input} />
             <input name="email" type="email" placeholder="Email address" maxLength={255} className={input} />
             <input name="practice" placeholder="Practice name (optional)" maxLength={150} className={input} />
             <textarea name="message" rows={5} placeholder="What would you like your dashboard to do?" maxLength={2000} className={input} />
             {error && <p className="text-sm text-destructive">{error}</p>}
-            <button disabled={status === "sending"} className="w-full rounded-full bg-primary px-8 py-4 font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60">
+            <button disabled={status === "sending"} className={`${btn} w-full px-8 py-4 disabled:opacity-60`}>
               {status === "sending" ? "Sending…" : "Send message"}
             </button>
           </form>
         )}
       </section>
 
-      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
-        © {new Date().getFullYear()} PracticeMD · practicemd.uk
+      <footer className="bg-primary py-10 text-primary-foreground">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 sm:flex-row">
+          <Logo variant="white" />
+          <p className="text-sm text-primary-foreground/80">© {new Date().getFullYear()} PracticeMD · practicemd.uk</p>
+        </div>
       </footer>
     </div>
   );

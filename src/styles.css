@@ -97,18 +97,38 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
-  --background: oklch(0.985 0.008 95);
-  --foreground: oklch(0.22 0.03 200);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.03 200);
-  --primary: oklch(0.48 0.09 185);
-  --primary-foreground: oklch(0.985 0.008 95);
-  --secondary: oklch(0.95 0.02 170);
-  --secondary-foreground: oklch(0.22 0.03 200);
-  --muted-foreground: oklch(0.48 0.03 200);
-  --border: oklch(0.9 0.015 170);
-  --input: oklch(0.88 0.015 170);
-  --ring: oklch(0.48 0.09 185);
+  /* PracticeMD brand: Forest #0B5D4E, Teal #14B8A6, Mint #E6F5F1, White */
+  --background: #ffffff;
+  --foreground: #0a2e27;
+  --card: #ffffff;
+  --card-foreground: #0a2e27;
+  --popover: #ffffff;
+  --popover-foreground: #0a2e27;
+  --primary: #0b5d4e;
+  --primary-foreground: #ffffff;
+  --secondary: #e6f5f1;
+  --secondary-foreground: #0b5d4e;
+  --muted: #e6f5f1;
+  --muted-foreground: #5b7570;
+  --accent: #14b8a6;
+  --accent-foreground: #ffffff;
+  --border: #d3e8e2;
+  --input: #c6ddd6;
+  --ring: #14b8a6;
+  --chart-1: #0b5d4e;
+  --chart-2: #14b8a6;
+  --chart-3: #7fd3c4;
+  --chart-4: #3e8a7b;
+  --chart-5: #b5e4d9;
+  --sidebar: #0b5d4e;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #14b8a6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #0e6e5d;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #0e6e5d;
+  --sidebar-ring: #14b8a6;
+  --shadow-soft: 0 8px 24px -12px color-mix(in oklab, var(--primary) 25%, transparent);
 }
 
 .dark {
