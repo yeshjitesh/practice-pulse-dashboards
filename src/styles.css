@@ -61,6 +61,12 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-sage: var(--sage);
+  --color-sage-foreground: var(--sage-foreground);
+  --color-peach: var(--peach);
+  --color-peach-foreground: var(--peach-foreground);
+  --color-sky: var(--sky);
+  --color-sky-foreground: var(--sky-foreground);
 }
 
 :root {
@@ -97,37 +103,43 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
-  /* PracticeMD brand: Royal #1E40AF, Blue #3B82F6, Ice #EFF6FF, White */
-  --background: #ffffff;
-  --foreground: #0f1d3d;
+  /* PracticeMD brand: Forest #0B5D4E, Teal #14B8A6, Mint #E6F5F1 + soft botanical tints */
+  --background: #fffdf8;
+  --foreground: #12332c;
   --card: #ffffff;
-  --card-foreground: #0f1d3d;
+  --card-foreground: #12332c;
   --popover: #ffffff;
-  --popover-foreground: #0f1d3d;
-  --primary: #1e40af;
+  --popover-foreground: #12332c;
+  --primary: #0b5d4e;
   --primary-foreground: #ffffff;
-  --secondary: #eff6ff;
-  --secondary-foreground: #1e40af;
-  --muted: #eff6ff;
-  --muted-foreground: #5b6b88;
-  --accent: #3b82f6;
+  --secondary: #e6f5f1;
+  --secondary-foreground: #0b5d4e;
+  --muted: #e6f5f1;
+  --muted-foreground: #5a6f69;
+  --accent: #14b8a6;
   --accent-foreground: #ffffff;
-  --border: #dbe5f5;
-  --input: #cbd8ef;
-  --ring: #3b82f6;
-  --chart-1: #1e40af;
-  --chart-2: #3b82f6;
-  --chart-3: #93c5fd;
-  --chart-4: #1d4ed8;
-  --chart-5: #bfdbfe;
-  --sidebar: #1e40af;
+  --border: #e3ece6;
+  --input: #d3e3dc;
+  --ring: #14b8a6;
+  --sage: #dcfce7;
+  --sage-foreground: #166534;
+  --peach: #ffedd5;
+  --peach-foreground: #9a4a12;
+  --sky: #dbeafe;
+  --sky-foreground: #1e4f9a;
+  --chart-1: #0b5d4e;
+  --chart-2: #14b8a6;
+  --chart-3: #f59e6b;
+  --chart-4: #6b9ee8;
+  --chart-5: #86d9a6;
+  --sidebar: #0b5d4e;
   --sidebar-foreground: #ffffff;
-  --sidebar-primary: #3b82f6;
+  --sidebar-primary: #14b8a6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2349b8;
+  --sidebar-accent: #0e6e5d;
   --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #2349b8;
-  --sidebar-ring: #3b82f6;
+  --sidebar-border: #0e6e5d;
+  --sidebar-ring: #14b8a6;
   --shadow-soft: 0 8px 24px -12px color-mix(in oklab, var(--primary) 25%, transparent);
 }
 

@@ -26,9 +26,9 @@ const schema = z.object({
 });
 
 const features = [
-  { t: "Built around you", d: "We start with how your practice runs — appointments, staff, finances — and design the dashboard to fit." },
-  { t: "Everything in one view", d: "Bring together the numbers you check every day so decisions take minutes, not hours." },
-  { t: "Grows with you", d: "Add new reports and tools as your practice changes. No rigid off‑the‑shelf limits." },
+  { t: "Built around you", d: "We start with how your practice runs — appointments, staff, finances — and design the dashboard to fit.", c: "bg-sage text-sage-foreground" },
+  { t: "Everything in one view", d: "Bring together the numbers you check every day so decisions take minutes, not hours.", c: "bg-peach text-peach-foreground" },
+  { t: "Grows with you", d: "Add new reports and tools as your practice changes. No rigid off‑the‑shelf limits.", c: "bg-sky text-sky-foreground" },
 ];
 
 function Index() {
@@ -84,8 +84,8 @@ function Index() {
         <div className="mx-auto grid max-w-6xl gap-6 px-6 py-20 md:grid-cols-3">
           {features.map((f, i) => (
             <div key={f.t} className="rounded-xl border border-border bg-card p-8 shadow-[var(--shadow-soft)]">
-              <span className="font-display text-4xl text-accent">0{i + 1}</span>
-              <h3 className="mt-3 text-xl font-semibold text-primary">{f.t}</h3>
+              <span className={`inline-flex h-12 w-12 items-center justify-center rounded-full font-display text-2xl ${f.c}`}>0{i + 1}</span>
+              <h3 className="mt-4 text-xl font-semibold text-primary">{f.t}</h3>
               <p className="mt-2 text-muted-foreground">{f.d}</p>
             </div>
           ))}
