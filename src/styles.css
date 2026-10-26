@@ -19,6 +19,8 @@
  */
 
 @theme inline {
+  --font-display: "DM Serif Display", serif;
+  --font-sans: "Fira Sans", sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -95,6 +97,18 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --background: oklch(0.985 0.008 95);
+  --foreground: oklch(0.22 0.03 200);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.03 200);
+  --primary: oklch(0.48 0.09 185);
+  --primary-foreground: oklch(0.985 0.008 95);
+  --secondary: oklch(0.95 0.02 170);
+  --secondary-foreground: oklch(0.22 0.03 200);
+  --muted-foreground: oklch(0.48 0.03 200);
+  --border: oklch(0.9 0.015 170);
+  --input: oklch(0.88 0.015 170);
+  --ring: oklch(0.48 0.09 185);
 }
 
 .dark {
