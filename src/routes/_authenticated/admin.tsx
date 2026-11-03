@@ -137,7 +137,7 @@ function Testimonials() {
     if (!row.quote.trim() || !row.author.trim()) return toast.error("Quote and name are required");
     const { error } = id ? await supabase.from("testimonials").update(row).eq("id", id) : await supabase.from("testimonials").insert(row);
     if (error) return toast.error("Couldn't save");
-    toast.success("Saved"); if (!id) e.currentTarget.reset(); refresh();
+    toast.success("Saved"); if (!id) e.currentTarget.reset(); refresh(); return undefined;
   }
   async function remove(id: string) {
     if (!confirm("Delete this testimonial?")) return;
@@ -190,7 +190,7 @@ function Faqs() {
     if (!row.question.trim() || !row.answer.trim()) return toast.error("Question and answer are required");
     const { error } = id ? await supabase.from("faqs").update(row).eq("id", id) : await supabase.from("faqs").insert(row);
     if (error) return toast.error("Couldn't save");
-    toast.success("Saved"); if (!id) e.currentTarget.reset(); refresh();
+    toast.success("Saved"); if (!id) e.currentTarget.reset(); refresh(); return undefined;
   }
   async function remove(id: string) {
     if (!confirm("Delete this question?")) return;
