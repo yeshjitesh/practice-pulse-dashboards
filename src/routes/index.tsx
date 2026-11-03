@@ -10,6 +10,7 @@ import teamPhoto from "@/assets/practice-team.jpg";
 const contentQuery = queryOptions({ queryKey: ["public-content"], queryFn: () => getPublicContent() });
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "PracticeMD — Practice management dashboards built for your practice" },
@@ -18,7 +19,13 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: "Custom practice management dashboards, built around your practice's needs." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:url", content: "https://practicemd.uk/" },
+      { property: "og:image", content: "https://practicemd.uk/og-image.jpg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: "https://practicemd.uk/og-image.jpg" },
     ],
+    links: [{ rel: "canonical", href: "https://practicemd.uk/" }],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(contentQuery),
   component: Index,

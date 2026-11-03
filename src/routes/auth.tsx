@@ -5,6 +5,7 @@ import { lovable } from "@/integrations/lovable";
 import { Logo } from "@/components/brand/Logo";
 
 export const Route = createFileRoute("/auth")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Sign in — PracticeMD" },
