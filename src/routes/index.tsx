@@ -262,7 +262,7 @@ function Index() {
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-24 md:grid-cols-2">
           <img data-reveal src={teamPhoto} alt="Practice manager reviewing a dashboard at a GP surgery reception" width={1280} height={960} loading="lazy" className="reveal aspect-[4/3] w-full rounded-2xl object-cover shadow-[var(--shadow-lift)]" />
           <div data-reveal className="reveal">
-            <h2 className="font-display text-4xl text-primary md:text-5xl">What your dashboard can show</h2>
+            <h2 className="font-display text-4xl text-primary md:text-5xl">Built for the people who run UK primary care</h2>
             <ul className="mt-8 space-y-5">
               {useCases.map((u) => (
                 <li key={u.t} className="flex gap-4">
@@ -278,22 +278,8 @@ function Index() {
         </div>
       </section>
 
-      {/* How it works */}
-      <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-6 py-24">
-        <h2 data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">How it works</h2>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {steps.map((s, i) => (
-            <div key={s.n} data-reveal className="reveal relative rounded-2xl border border-border bg-card p-8" style={{ transitionDelay: `${i * 100}ms` }}>
-              <span className="font-display text-5xl text-accent/40">{s.n}</span>
-              <h3 className="mt-3 text-xl font-semibold text-primary">{s.t}</h3>
-              <p className="mt-2 text-muted-foreground">{s.d}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Features for UK primary care */}
-      <section id="features" className="scroll-mt-24 bg-secondary">
+      <section id="features" className="scroll-mt-24">
         <div className="mx-auto max-w-6xl px-6 py-24">
           <h2 data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">Everything a UK practice runs on</h2>
           <p data-reveal className="reveal mt-4 max-w-2xl text-lg text-muted-foreground">
@@ -315,6 +301,22 @@ function Index() {
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section id="how" className="scroll-mt-24 bg-secondary">
+        <div className="mx-auto max-w-6xl px-6 py-24">
+        <h2 data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">How it works</h2>
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {steps.map((s, i) => (
+            <div key={s.n} data-reveal className="reveal relative rounded-2xl border border-border bg-card p-8" style={{ transitionDelay: `${i * 100}ms` }}>
+              <span className="font-display text-5xl text-accent/40">{s.n}</span>
+              <h3 className="mt-3 text-xl font-semibold text-primary">{s.t}</h3>
+              <p className="mt-2 text-muted-foreground">{s.d}</p>
+            </div>
+          ))}
+        </div>
         </div>
       </section>
 
