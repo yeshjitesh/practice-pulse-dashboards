@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { z } from "zod";
@@ -320,7 +320,6 @@ function Index() {
           <Logo variant="white" />
           <div className="flex items-center gap-6 text-sm text-primary-foreground/80">
             <span>© {new Date().getFullYear()} PracticeMD · practicemd.uk</span>
-            <Link to="/auth" className="hover:text-primary-foreground">Admin</Link>
           </div>
         </div>
       </footer>
