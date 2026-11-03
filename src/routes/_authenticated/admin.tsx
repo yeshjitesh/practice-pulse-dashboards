@@ -111,6 +111,16 @@ function Messages() {
             </div>
             <span className="text-xs text-muted-foreground">{new Date(m.created_at).toLocaleString("en-GB")}</span>
           </div>
+          <dl className="mt-3 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
+            {([
+              ["Phone", m.phone], ["Role", m.job_role], ["Organisation", m.organisation_type],
+              ["List size", m.list_size], ["Clinical system", m.clinical_system], ["Timeline", m.timeline],
+              ["Prefers", m.contact_preference], ["Heard via", m.heard_about],
+              ["Interested in", m.interests?.join(", ")],
+            ] as const).filter(([, v]) => v).map(([k, v]) => (
+              <div key={k}><dt className="inline text-muted-foreground">{k}: </dt><dd className="inline text-foreground">{v}</dd></div>
+            ))}
+          </dl>
           <p className="mt-3 whitespace-pre-wrap text-foreground">{m.message}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {["new", "replied", "closed"].map((s) => (

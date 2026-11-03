@@ -16,31 +16,58 @@ export type Database = {
     Tables: {
       contact_submissions: {
         Row: {
+          clinical_system: string | null
+          contact_preference: string | null
           created_at: string
           email: string
+          heard_about: string | null
           id: string
+          interests: string[] | null
+          job_role: string | null
+          list_size: string | null
           message: string
           name: string
+          organisation_type: string | null
+          phone: string | null
           practice: string | null
           status: string
+          timeline: string | null
         }
         Insert: {
+          clinical_system?: string | null
+          contact_preference?: string | null
           created_at?: string
           email: string
+          heard_about?: string | null
           id?: string
+          interests?: string[] | null
+          job_role?: string | null
+          list_size?: string | null
           message: string
           name: string
+          organisation_type?: string | null
+          phone?: string | null
           practice?: string | null
           status?: string
+          timeline?: string | null
         }
         Update: {
+          clinical_system?: string | null
+          contact_preference?: string | null
           created_at?: string
           email?: string
+          heard_about?: string | null
           id?: string
+          interests?: string[] | null
+          job_role?: string | null
+          list_size?: string | null
           message?: string
           name?: string
+          organisation_type?: string | null
+          phone?: string | null
           practice?: string | null
           status?: string
+          timeline?: string | null
         }
         Relationships: []
       }
