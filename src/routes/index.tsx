@@ -50,6 +50,26 @@ const useCases = [
   { t: "Patient experience", d: "Follow feedback and waiting times at a glance." },
 ];
 
+const tints = ["bg-sage text-sage-foreground", "bg-peach text-peach-foreground", "bg-sky text-sky-foreground"];
+
+const features = [
+  { tag: "Income", t: "QOF tracker", items: ["Points achieved vs available, by domain and indicator", "Patients still to treat, with recall lists", "Year‑end projection and prevalence trends", "PCAs and exception reporting overview"] },
+  { tag: "Income", t: "Enhanced Services (ES / LES / DES)", items: ["Activity vs target for each service", "Claims ready, submitted and paid", "Missed‑claim alerts before deadlines", "Locally commissioned service tracking"] },
+  { tag: "Compliance", t: "CQC readiness", items: ["Evidence mapped to the five key questions", "Policy review dates and owners", "Audit, significant event and complaint logs", "Inspection‑ready summary pack"] },
+  { tag: "Team", t: "Rotas & staffing", items: ["GP, nurse, HCA and reception cover by session", "Leave, sickness and locum usage", "Gaps flagged weeks ahead", "ARRS roles and hours across the PCN"] },
+  { tag: "Team", t: "Tasks & workflow", items: ["Task and document backlogs by person", "Docman and lab results waiting", "Overdue tasks and handovers", "Admin workload balance"] },
+  { tag: "Access", t: "Appointments & access", items: ["Capacity vs demand by day and clinician", "DNA rates and wasted minutes", "Same‑day, 2‑week and online consultation volumes", "GPAD data and access targets"] },
+  { tag: "Clinical", t: "Long‑term conditions & recalls", items: ["Diabetes, asthma, COPD, hypertension registers", "Annual review and recall status", "Medication reviews due", "Learning disability and SMI health checks"] },
+  { tag: "Clinical", t: "Screening & immunisations", items: ["Childhood immunisation uptake", "Flu, COVID and shingles campaigns", "Cervical, bowel and breast screening rates", "Patients to invite this week"] },
+  { tag: "Prescribing", t: "Prescribing & medicines", items: ["Spend vs budget and PrescQIPP indicators", "Antibiotic and high‑risk drug monitoring", "Repeat prescription turnaround", "Medicines optimisation savings"] },
+  { tag: "Finance", t: "Practice finance", items: ["Global sum, PCN and ES income in one view", "Monthly income vs expenditure", "Staff costs as a share of income", "Cash‑flow forecast"] },
+  { tag: "Quality", t: "Patient experience", items: ["Friends & Family Test results", "GP Patient Survey trends", "Complaints and compliments", "Phone wait times and call volumes"] },
+  { tag: "Team", t: "Training & HR", items: ["Mandatory training compliance by staff", "DBS, registration and appraisal dates", "Revalidation reminders", "Induction checklists"] },
+  { tag: "PCN", t: "PCN & IIF overview", items: ["IIF indicators and earnings", "Practice comparisons across the network", "Shared ARRS staff usage", "Network DES deliverables"] },
+  { tag: "Population", t: "Population health", items: ["List size, growth and demographics", "Deprivation and health inequalities", "Frequent attenders and high‑risk patients", "Care home and housebound patients"] },
+  { tag: "Safety", t: "Safety & governance", items: ["Significant events and learning actions", "Safeguarding registers and reviews", "Fridge temperature and equipment checks", "Data protection (DSPT) status"] },
+];
+
 function useReveal() {
   useEffect(() => {
     const els = document.querySelectorAll<HTMLElement>("[data-reveal]");
@@ -130,6 +150,7 @@ function Index() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <a href="/" aria-label="PracticeMD home"><Logo subtitle iconOnlyOnMobile /></a>
           <nav className="flex items-center gap-6 text-sm">
+            <a href="#features" className="hidden text-muted-foreground transition-colors hover:text-primary md:inline">Features</a>
             <a href="#how" className="hidden text-muted-foreground transition-colors hover:text-primary md:inline">How it works</a>
             <a href="#faq" className="hidden text-muted-foreground transition-colors hover:text-primary md:inline">FAQ</a>
             <a href="#contact" className={`${btn} px-5 py-2`}>Get in touch</a>
@@ -221,24 +242,31 @@ function Index() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      {data.testimonials.length > 0 && (
-        <section className="bg-primary text-primary-foreground">
-          <div className="mx-auto max-w-6xl px-6 py-24">
-            <h2 data-reveal className="reveal font-display text-4xl md:text-5xl">What practices say</h2>
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {data.testimonials.map((t) => (
-                <figure key={t.id} data-reveal className="reveal rounded-2xl bg-primary-foreground/10 p-8">
-                  <blockquote className="text-lg leading-relaxed">"{t.quote}"</blockquote>
-                  <figcaption className="mt-6 text-sm text-primary-foreground/80">
-                    <span className="font-semibold text-primary-foreground">{t.author}</span>{t.role && ` · ${t.role}`}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
+      {/* Features for UK primary care */}
+      <section id="features" className="scroll-mt-24 bg-secondary">
+        <div className="mx-auto max-w-6xl px-6 py-24">
+          <h2 data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">Everything a UK practice runs on</h2>
+          <p data-reveal className="reveal mt-4 max-w-2xl text-lg text-muted-foreground">
+            Example dashboards we build for GP surgeries, PCNs and primary care teams. Pick what you need, and we shape it to your practice.
+          </p>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f, i) => (
+              <article key={f.t} data-reveal className="reveal rounded-2xl border border-border bg-card p-7 shadow-[var(--shadow-soft)]" style={{ transitionDelay: `${(i % 3) * 80}ms` }}>
+                <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${tints[i % 3]}`}>{f.tag}</span>
+                <h3 className="mt-4 text-xl font-semibold text-primary">{f.t}</h3>
+                <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                  {f.items.map((it) => (
+                    <li key={it} className="flex gap-2">
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* FAQ */}
       {data.faqs.length > 0 && (
