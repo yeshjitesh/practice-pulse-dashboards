@@ -75,10 +75,10 @@ const steps = [
 ];
 
 const useCases = [
-  { t: "Appointments & demand", d: "See booked, available and missed appointments side by side." },
-  { t: "Staffing & rotas", d: "Spot gaps in cover before they become problems." },
-  { t: "Finance & targets", d: "Track income, claims and QOF-style targets in one place." },
-  { t: "Patient experience", d: "Follow feedback and waiting times at a glance." },
+  { t: "Practice Managers", d: "One place for targets, staffing, income and compliance, instead of a dozen spreadsheets." },
+  { t: "GP Partners", d: "A clear view of practice performance and finances to guide decisions." },
+  { t: "PCNs & Federations", d: "Compare practices, track IIF and ARRS staff across the network." },
+  { t: "Clinical & admin leads", d: "Recalls, tasks and workloads at a glance, so nothing slips." },
 ];
 
 const tints = ["bg-sage text-sage-foreground", "bg-peach text-peach-foreground", "bg-sky text-sky-foreground"];
@@ -224,7 +224,7 @@ function Index() {
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <a href="#contact" className={`${btn} px-8 py-4`}>Tell us what you need</a>
-              <a href="#how" className={`${btnGhost} px-8 py-4`}>See how it works</a>
+              <a href="#features" className={`${btnGhost} px-8 py-4`}>Explore features</a>
             </div>
           </div>
           <div className="animate-fade-up [animation-delay:150ms]"><DashboardMock /></div>
