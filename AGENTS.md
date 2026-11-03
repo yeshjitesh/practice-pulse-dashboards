@@ -9,3 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 - Brand logo lives in src/components/brand/Logo.tsx (SVG using theme tokens); favicons/app icons in public/ are rendered from public/favicon.svg — keeps the brand in one place.
+- Admin area: /admin under _authenticated (client-only gate); admin rights come from public.user_roles via has_role(); first signup auto-becomes admin via trigger. Public page content (testimonials, faqs) is read through a server fn with the publishable key.
