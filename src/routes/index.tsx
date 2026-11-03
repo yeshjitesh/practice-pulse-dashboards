@@ -24,12 +24,43 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+const roles = ["Practice Manager", "GP Partner", "Salaried GP", "Operations / Business Manager", "Nurse / Clinical Lead", "PCN Manager / Clinical Director", "Admin / Reception Lead", "Other"];
+const orgTypes = ["Single GP practice", "Multi-site practice", "Primary Care Network (PCN)", "GP Federation", "ICB / Commissioner", "Other"];
+const listSizes = ["Under 5,000", "5,000 – 10,000", "10,000 – 20,000", "20,000 – 50,000", "Over 50,000"];
+const systems = ["EMIS Web", "SystmOne (TPP)", "Vision", "Other / not sure"];
+const interestOptions = ["QOF", "Enhanced Services", "CQC readiness", "Rotas & staffing", "Tasks & workflow", "Appointments & access", "Long-term conditions", "Screening & immunisations", "Prescribing", "Finance", "Patient experience", "Training & HR", "PCN / IIF", "Population health", "Safety & governance"];
+const timelines = ["As soon as possible", "Within 1–3 months", "Within 3–6 months", "Just exploring"];
+const contactPrefs = ["Email", "Phone call", "Video call"];
+const heardOptions = ["Search engine", "Recommendation", "LinkedIn / social media", "Event or conference", "Other"];
+
+const optText = (max: number) => z.string().trim().max(max).optional();
 const schema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(100),
   email: z.string().trim().email("Please enter a valid email").max(255),
-  practice: z.string().trim().max(150).optional(),
+  phone: z.string().trim().max(30).regex(/^[0-9+()\s-]*$/, "Please enter a valid phone number").optional(),
+  practice: optText(150),
+  job_role: optText(80),
+  organisation_type: optText(80),
+  list_size: optText(40),
+  clinical_system: optText(80),
+  interests: z.array(z.string().max(60)).max(30),
+  timeline: optText(80),
+  contact_preference: optText(40),
+  heard_about: optText(120),
   message: z.string().trim().min(1, "Please tell us a little about your needs").max(2000),
 });
+
+const lbl = "block space-y-1.5 text-sm font-medium text-foreground";
+const legend = "font-display text-xl text-primary";
+const selectCls = "mt-1.5 w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-ring/30";
+function Select({ name, options }: { name: string; options: string[] }) {
+  return (
+    <select name={name} defaultValue="" className={selectCls}>
+      <option value="">Select…</option>
+      {options.map((o) => <option key={o} value={o}>{o}</option>)}
+    </select>
+  );
+}
 
 const benefits = [
   { t: "Built around you", d: "We start with how your practice runs — appointments, staff, finances — and design the dashboard to fit.", c: "bg-sage text-sage-foreground" },
@@ -125,14 +156,33 @@ function Index() {
     setError("");
     const form = e.currentTarget;
     const raw = Object.fromEntries(new FormData(form)) as Record<string, string>;
-    const parsed = schema.safeParse({ ...raw, practice: raw["practice"] || undefined });
+    const fd = new FormData(form);
+    const opt = (k: string) => (raw[k] && raw[k].trim()) || undefined;
+    const parsed = schema.safeParse({
+      ...raw,
+      practice: opt("practice"), phone: opt("phone"), job_role: opt("job_role"),
+      organisation_type: opt("organisation_type"), list_size: opt("list_size"),
+      clinical_system: opt("clinical_system"), timeline: opt("timeline"),
+      contact_preference: opt("contact_preference"), heard_about: opt("heard_about"),
+      interests: fd.getAll("interests").map(String),
+    });
     if (!parsed.success) return setError(parsed.error.issues[0]?.message ?? "Please check the form");
     setStatus("sending");
+    const d = parsed.data;
     const { error } = await supabase.from("contact_submissions").insert({
-      name: parsed.data.name,
-      email: parsed.data.email,
-      practice: parsed.data.practice ?? null,
-      message: parsed.data.message,
+      name: d.name,
+      email: d.email,
+      practice: d.practice ?? null,
+      message: d.message,
+      phone: d.phone ?? null,
+      job_role: d.job_role ?? null,
+      organisation_type: d.organisation_type ?? null,
+      list_size: d.list_size ?? null,
+      clinical_system: d.clinical_system ?? null,
+      interests: d.interests.length ? d.interests : null,
+      timeline: d.timeline ?? null,
+      contact_preference: d.contact_preference ?? null,
+      heard_about: d.heard_about ?? null,
     });
     if (error) {
       setStatus("idle");
@@ -301,11 +351,45 @@ function Index() {
               <p className="mt-2 text-muted-foreground">Your message has been received. We'll be in touch soon.</p>
             </div>
           ) : (
-            <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] md:p-8">
-              <input name="name" placeholder="Your name" maxLength={100} className={input} />
-              <input name="email" type="email" placeholder="Email address" maxLength={255} className={input} />
-              <input name="practice" placeholder="Practice name (optional)" maxLength={150} className={input} />
-              <textarea name="message" rows={5} placeholder="What would you like your dashboard to do?" maxLength={2000} className={input} />
+            <form onSubmit={onSubmit} className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] md:p-8">
+              <fieldset className="space-y-4">
+                <legend className={legend}>About you</legend>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className={lbl}>Full name *<input name="name" autoComplete="name" maxLength={100} className={input} /></label>
+                  <label className={lbl}>Email *<input name="email" type="email" autoComplete="email" maxLength={255} className={input} /></label>
+                  <label className={lbl}>Phone<input name="phone" type="tel" autoComplete="tel" maxLength={30} className={input} /></label>
+                  <label className={lbl}>Your role<Select name="job_role" options={roles} /></label>
+                </div>
+              </fieldset>
+              <fieldset className="space-y-4">
+                <legend className={legend}>Your practice</legend>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className={`${lbl} sm:col-span-2`}>Practice or organisation name<input name="practice" maxLength={150} className={input} /></label>
+                  <label className={lbl}>Organisation type<Select name="organisation_type" options={orgTypes} /></label>
+                  <label className={lbl}>Patient list size<Select name="list_size" options={listSizes} /></label>
+                  <label className={`${lbl} sm:col-span-2`}>Clinical system<Select name="clinical_system" options={systems} /></label>
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend className={legend}>What would you like to see?</legend>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {interestOptions.map((o) => (
+                    <label key={o} className="cursor-pointer">
+                      <input type="checkbox" name="interests" value={o} className="peer sr-only" />
+                      <span className="inline-block rounded-full border border-input bg-background px-3 py-1.5 text-sm text-muted-foreground transition-colors peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring">{o}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset className="space-y-4">
+                <legend className={legend}>Next steps</legend>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className={lbl}>When would you like to start?<Select name="timeline" options={timelines} /></label>
+                  <label className={lbl}>Best way to reach you<Select name="contact_preference" options={contactPrefs} /></label>
+                  <label className={`${lbl} sm:col-span-2`}>How did you hear about us?<Select name="heard_about" options={heardOptions} /></label>
+                  <label className={`${lbl} sm:col-span-2`}>Tell us about your needs *<textarea name="message" rows={5} placeholder="What challenges are you facing, and what would you like your dashboard to do?" maxLength={2000} className={input} /></label>
+                </div>
+              </fieldset>
               {error && <p className="text-sm text-destructive">{error}</p>}
               <button disabled={status === "sending"} className={`${btn} w-full px-8 py-4 disabled:opacity-60`}>
                 {status === "sending" ? "Sending…" : "Send message"}
