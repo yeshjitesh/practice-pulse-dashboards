@@ -10,6 +10,7 @@ import teamPhoto from "@/assets/practice-team.jpg";
 const contentQuery = queryOptions({ queryKey: ["public-content"], queryFn: () => getPublicContent() });
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "PracticeMD — Practice management dashboards built for your practice" },
