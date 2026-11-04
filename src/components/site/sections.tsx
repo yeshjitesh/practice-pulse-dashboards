@@ -98,7 +98,7 @@ type H = "h1" | "h2";
 export function FeaturesSection({ as: Tag = "h2" }: { as?: H }) {
   return (
       <section id="features" className="scroll-mt-24">
-        <div className="mx-auto max-w-6xl px-6 py-24">
+        <div className="mx-auto max-w-7xl 2xl:max-w-[90rem] px-6 lg:px-10 py-24">
           <div data-reveal className="reveal"><Eyebrow>Features</Eyebrow></div>
           <Tag data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">Everything a UK practice runs on</Tag>
           <p data-reveal className="reveal mt-4 max-w-2xl text-lg text-muted-foreground">
@@ -128,7 +128,7 @@ export function FeaturesSection({ as: Tag = "h2" }: { as?: H }) {
 export function HowSection({ as: Tag = "h2" }: { as?: H }) {
   return (
       <section id="how" className="scroll-mt-24 bg-blush">
-        <div className="mx-auto max-w-6xl px-6 py-24">
+        <div className="mx-auto max-w-7xl 2xl:max-w-[90rem] px-6 lg:px-10 py-24">
         <div data-reveal className="reveal"><Eyebrow dot="bg-rose">The process</Eyebrow></div>
         <Tag data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">How it works</Tag>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
@@ -223,7 +223,7 @@ export function ContactSection({ as: Tag = "h2" }: { as?: H }) {
 
   return (
       <section id="contact" className="scroll-mt-20 bg-secondary">
-        <div className="mx-auto grid max-w-6xl gap-12 px-6 py-24 md:grid-cols-2">
+        <div className="mx-auto grid max-w-7xl 2xl:max-w-[90rem] gap-12 px-6 lg:px-10 py-24 md:grid-cols-2">
           <div data-reveal className="reveal">
             <Eyebrow>Contact</Eyebrow>
             <Tag className="font-display text-4xl text-primary md:text-5xl">Let's talk about your practice</Tag>

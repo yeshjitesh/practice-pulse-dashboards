@@ -107,7 +107,7 @@ function Index() {
     <SiteShell>
       {/* Hero */}
       <section className="relative">
-                <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-6 pb-20 pt-16 md:grid-cols-[1.1fr_1fr] md:pt-24">
+                <div className="relative mx-auto grid max-w-7xl 2xl:max-w-[90rem] items-center gap-14 px-6 lg:px-10 pb-20 pt-16 md:grid-cols-[1.1fr_1fr] md:pt-24">
           <div className="animate-fade-up">
             <p className="mb-6 inline-flex flex-wrap items-center gap-2 rounded-full border border-input bg-secondary px-4 py-1.5 text-sm text-foreground">
               <span className="text-accent" aria-hidden>✦</span>
@@ -131,7 +131,7 @@ function Index() {
 
       {/* Trust strip */}
       <section className="border-y border-input bg-blush">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-3 px-6 py-6 text-center font-mono text-xs uppercase tracking-[0.06em] text-foreground sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:text-sm">
+        <div className="mx-auto grid max-w-7xl 2xl:max-w-[90rem] grid-cols-2 gap-x-4 gap-y-3 px-6 lg:px-10 py-6 text-center font-mono text-xs uppercase tracking-[0.06em] text-foreground sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:text-sm">
           {[["UK", "primary care"], ["15+", "dashboard types"], ["Your", "workflow"], ["Ongoing", "support"]].map(([b, t], i) => (
             <span key={t} className="inline-flex items-center justify-center">
               {i > 0 && <span className="mx-6 hidden h-4 w-px bg-rose sm:inline-block" aria-hidden />}
@@ -142,7 +142,7 @@ function Index() {
       </section>
 
       {/* Benefits */}
-      <section className="mx-auto max-w-6xl px-6 py-24">
+      <section className="mx-auto max-w-7xl 2xl:max-w-[90rem] px-6 lg:px-10 py-24">
         <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
           <div data-reveal className="reveal max-w-2xl">
             <Eyebrow>Why PracticeMD</Eyebrow>
@@ -164,7 +164,7 @@ function Index() {
 
       {/* Photo + use cases */}
       <section className="bg-secondary">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-24 md:grid-cols-2">
+        <div className="mx-auto grid max-w-7xl 2xl:max-w-[90rem] items-center gap-12 px-6 lg:px-10 py-24 md:grid-cols-2">
           <img data-reveal src={teamDrawing} alt="Drawing of a practice manager, GP and nurse looking at a practice dashboard together" width={1280} height={960} loading="lazy" className="reveal aspect-[4/3] w-full rounded-xl border border-border object-cover" />
           <div data-reveal className="reveal">
             <Eyebrow dot="bg-navy">Who it's for</Eyebrow>

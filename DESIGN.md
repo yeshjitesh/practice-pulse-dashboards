@@ -31,6 +31,6 @@ Never recolour the logo (`src/components/brand/Logo.tsx`).
 - Illustrations: hand-drawn style drawings, not photos.
 
 ## Layout
-- Container max-w-6xl, px-6; sections py-20 to py-28.
+- Container max-w-7xl (2xl: 90rem), px-6 (lg: px-10); sections py-20 to py-28.
 - Phones: buttons stack full width; strips become 2×2 grids; decorative drawings may hide.
 - Motion: gentle fade-up on scroll only, disabled for reduced motion.
