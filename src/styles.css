@@ -67,6 +67,12 @@
   --color-peach-foreground: var(--peach-foreground);
   --color-sky: var(--sky);
   --color-sky-foreground: var(--sky-foreground);
+  --color-navy: var(--navy);
+  --color-navy-foreground: var(--navy-foreground);
+  --color-blush: var(--blush);
+  --color-blush-foreground: var(--blush-foreground);
+  --color-rose: var(--rose);
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
 :root {
@@ -127,6 +133,12 @@
   --peach-foreground: #9a4a12;
   --sky: #dbeafe;
   --sky-foreground: #1e4f9a;
+  /* Editorial accents blended in from the style guide */
+  --navy: #16325a;
+  --navy-foreground: #ffffff;
+  --blush: #f2e8e2;
+  --blush-foreground: #7a3f57;
+  --rose: #d6aec1;
   --chart-1: #0b5d4e;
   --chart-2: #14b8a6;
   --chart-3: #f59e6b;
