@@ -233,7 +233,7 @@ function Index() {
             <p className="mb-6 inline-flex flex-wrap items-center gap-2 rounded-full border border-input bg-secondary px-4 py-1.5 text-sm text-foreground">
               <span className="text-accent" aria-hidden>✦</span>
               <span className="font-mono text-xs font-semibold uppercase tracking-[0.06em] text-primary">For GP practices</span>
-              <span className="text-muted-foreground">Built to fit, not off the shelf.</span>
+              <span className="hidden text-muted-foreground sm:inline">Built to fit, not off the shelf.</span>
             </p>
             <h1 className="font-display text-5xl leading-[1.05] text-primary md:text-6xl lg:text-7xl">
               A dashboard shaped by <em className="text-accent">your</em> practice.
