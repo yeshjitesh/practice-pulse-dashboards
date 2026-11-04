@@ -177,7 +177,6 @@ export function FaqSection({ faqs, as: Tag = "h2" }: { faqs: Faq[]; as?: H }) {
 export function ContactSection({ as: Tag = "h2" }: { as?: H }) {
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [error, setError] = useState("");
-  const [open, setOpen] = useState<string | null>(null);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
