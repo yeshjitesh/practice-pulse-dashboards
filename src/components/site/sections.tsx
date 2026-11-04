@@ -104,7 +104,7 @@ export function FeaturesSection({ as: Tag = "h2" }: { as?: H }) {
           <p data-reveal className="reveal mt-4 max-w-2xl text-lg text-muted-foreground">
             Example dashboards we build for GP surgeries, PCNs and primary care teams. Pick what you need, and we shape it to your practice.
           </p>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             {features.map((f, i) => (
               <article key={f.t} data-reveal className={`reveal rounded-xl border border-border p-7 ${cardFills[i % 3]}`} style={{ transitionDelay: `${(i % 3) * 80}ms` }}>
                 <span className={`inline-block rounded-full px-3 py-1 font-mono text-[0.7rem] font-semibold uppercase tracking-[0.06em] ${tints[i % 4]}`}>{f.tag}</span>
