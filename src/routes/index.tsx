@@ -23,7 +23,9 @@ const contentQuery = queryOptions({ queryKey: ["public-content"], queryFn: () =>
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
-  head: ({ loaderData }) => ({
+  head: ({ loaderData }) => {
+    const faqs = ((loaderData as unknown as { faqs?: { question: string; answer: string }[] } | undefined)?.faqs) ?? [];
+    return {
     meta: [
       { title: "PracticeMD — Practice management dashboards built for your practice" },
       { name: "description", content: "PracticeMD builds bespoke practice management dashboards tailored to how your GP practice actually works." },
@@ -59,17 +61,18 @@ export const Route = createFileRoute("/")({
             areaServed: { "@type": "Country", name: "United Kingdom" },
           },
           { "@context": "https://schema.org", "@type": "WebSite", name: "PracticeMD", url: "https://practicemd.uk/", inLanguage: "en-GB" },
-          ...(loaderData?.faqs?.length
+          ...(faqs.length
             ? [{
                 "@context": "https://schema.org",
                 "@type": "FAQPage",
-                mainEntity: loaderData.faqs.map((f) => ({ "@type": "Question", name: f.question, acceptedAnswer: { "@type": "Answer", text: f.answer } })),
+                mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.question, acceptedAnswer: { "@type": "Answer", text: f.answer } })),
               }]
             : []),
         ]),
       },
     ],
-  }),
+  };
+  },
   loader: ({ context }) => context.queryClient.ensureQueryData(contentQuery),
   component: Index,
 });
