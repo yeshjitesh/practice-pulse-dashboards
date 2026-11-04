@@ -89,7 +89,7 @@ const useCases = [
   { t: "Clinical & admin leads", d: "Recalls, tasks and workloads at a glance, so nothing slips." },
 ];
 
-const tints = ["bg-sage text-sage-foreground", "bg-peach text-peach-foreground", "bg-sky text-sky-foreground", "bg-blush text-blush-foreground"];
+const tints = ["bg-sage text-sage-foreground", "bg-peach text-peach-foreground", "bg-sky text-sky-foreground", "bg-card text-blush-foreground"];
 const cardFills = ["bg-secondary", "bg-blush", "bg-card"];
 
 const features = [
@@ -143,9 +143,9 @@ function DashboardMock() {
         <span className="rounded-full bg-sage px-3 py-1 text-xs font-medium text-sage-foreground">On track</span>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-3">
-        {[["Appointments", "1,284", "bg-secondary"], ["DNA rate", "3.1%", "bg-peach"], ["Staff cover", "96%", "bg-sky"]].map(([l, v, c]) => (
+        {[["Appts", "1,284", "bg-secondary"], ["DNA rate", "3.1%", "bg-peach"], ["Cover", "96%", "bg-sky"]].map(([l, v, c]) => (
           <div key={l} className={`rounded-xl p-3 ${c}`}>
-            <p className="font-mono text-[0.6rem] uppercase tracking-[0.06em] text-muted-foreground">{l}</p>
+            <p className="truncate font-mono text-[0.6rem] uppercase tracking-[0.04em] text-muted-foreground">{l}</p>
             <p className="mt-1 font-display text-xl text-primary">{v}</p>
           </div>
         ))}
@@ -241,7 +241,7 @@ function Index() {
             <p className="mt-6 max-w-xl text-lg text-muted-foreground">
               PracticeMD designs and builds custom practice management dashboards — tailored to the way your team works and the numbers you care about.
             </p>
-            <div className="mt-10 flex flex-wrap gap-3">
+            <div className="mt-10 grid gap-3 sm:flex sm:flex-wrap">
               <a href="#contact" className={`${btn} px-8 py-4`}>Tell us what you need</a>
               <a href="#features" className={`${btnNavy} px-8 py-4`}>Explore features</a>
             </div>
@@ -252,10 +252,10 @@ function Index() {
 
       {/* Trust strip */}
       <section className="border-y border-input bg-blush">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-y-3 px-6 py-6 font-mono text-xs uppercase tracking-[0.06em] text-foreground sm:text-sm">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-3 px-6 py-6 text-center font-mono text-xs uppercase tracking-[0.06em] text-foreground sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:text-sm">
           {[["UK", "primary care"], ["15+", "dashboard types"], ["Your", "workflow"], ["Ongoing", "support"]].map(([b, t], i) => (
-            <span key={t} className="inline-flex items-center">
-              {i > 0 && <span className="mx-4 h-4 w-px bg-rose sm:mx-6" aria-hidden />}
+            <span key={t} className="inline-flex items-center justify-center">
+              {i > 0 && <span className="mx-6 hidden h-4 w-px bg-rose sm:inline-block" aria-hidden />}
               <span className="font-semibold text-primary">{b}</span>&nbsp;{t}
             </span>
           ))}
