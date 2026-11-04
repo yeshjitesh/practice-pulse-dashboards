@@ -143,7 +143,7 @@ function DashboardMock() {
         <span className="rounded-full bg-sage px-3 py-1 text-xs font-medium text-sage-foreground">On track</span>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-3">
-        {[["Appointments", "1,284", "bg-secondary"], ["DNA rate", "3.1%", "bg-peach"], ["Staff cover", "96%", "bg-sky"]].map(([l, v, c]) => (
+        {[["Appts", "1,284", "bg-secondary"], ["DNA rate", "3.1%", "bg-peach"], ["Cover", "96%", "bg-sky"]].map(([l, v, c]) => (
           <div key={l} className={`rounded-xl p-3 ${c}`}>
             <p className="truncate font-mono text-[0.6rem] uppercase tracking-[0.04em] text-muted-foreground">{l}</p>
             <p className="mt-1 font-display text-xl text-primary">{v}</p>
