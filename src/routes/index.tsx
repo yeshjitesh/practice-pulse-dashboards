@@ -10,8 +10,7 @@ import benefitsDrawing from "@/assets/benefits-drawing.jpg";
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
-  head: ({ loaderData }) => {
-    const faqs = ((loaderData as unknown as { faqs?: { question: string; answer: string }[] } | undefined)?.faqs) ?? [];
+  head: () => {
     return {
     meta: [
       { title: "PracticeMD — Practice management dashboards built for your practice" },
@@ -48,13 +47,6 @@ export const Route = createFileRoute("/")({
             areaServed: { "@type": "Country", name: "United Kingdom" },
           },
           { "@context": "https://schema.org", "@type": "WebSite", name: "PracticeMD", url: "https://practicemd.uk/", inLanguage: "en-GB" },
-          ...(faqs.length
-            ? [{
-                "@context": "https://schema.org",
-                "@type": "FAQPage",
-                mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.question, acceptedAnswer: { "@type": "Answer", text: f.answer } })),
-              }]
-            : []),
         ]),
       },
     ],
