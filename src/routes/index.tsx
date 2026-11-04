@@ -7,6 +7,17 @@ import { Logo } from "@/components/brand/Logo";
 import { getPublicContent } from "@/lib/content.functions";
 import teamDrawing from "@/assets/practice-team-drawing.jpg";
 import contactDrawing from "@/assets/contact-drawing.jpg";
+import benefitsDrawing from "@/assets/benefits-drawing.jpg";
+import stepChat from "@/assets/step-chat-drawing.jpg";
+import stepBuild from "@/assets/step-build-drawing.jpg";
+import stepGrow from "@/assets/step-grow-drawing.jpg";
+import faqDrawing from "@/assets/faq-drawing.jpg";
+
+const stepDrawings = [
+  { src: stepChat, alt: "Drawing of a practice manager and a GP talking over a notebook" },
+  { src: stepBuild, alt: "Drawing of a designer sketching dashboard charts in a browser window" },
+  { src: stepGrow, alt: "Drawing of a clinician watering a plant growing from a rising bar chart" },
+];
 
 const contentQuery = queryOptions({ queryKey: ["public-content"], queryFn: () => getPublicContent() });
 
@@ -264,10 +275,13 @@ function Index() {
 
       {/* Benefits */}
       <section className="mx-auto max-w-6xl px-6 py-24">
-        <div data-reveal className="reveal max-w-2xl">
-          <Eyebrow>Why PracticeMD</Eyebrow>
-          <h2 className="font-display text-4xl text-primary md:text-5xl">Less time searching. More time for patients.</h2>
-          <p className="mt-4 text-lg text-muted-foreground">Every practice is different, so your dashboard should be too.</p>
+        <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
+          <div data-reveal className="reveal max-w-2xl">
+            <Eyebrow>Why PracticeMD</Eyebrow>
+            <h2 className="font-display text-4xl text-primary md:text-5xl">Less time searching. More time for patients.</h2>
+            <p className="mt-4 text-lg text-muted-foreground">Every practice is different, so your dashboard should be too.</p>
+          </div>
+          <img data-reveal src={benefitsDrawing} alt="Drawing of a relaxed practice manager with a coffee next to a laptop showing one simple dashboard" width={1024} height={768} loading="lazy" className="reveal w-full rounded-xl border border-border" />
         </div>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {benefits.map((f, i) => (
@@ -336,10 +350,13 @@ function Index() {
         <h2 data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">How it works</h2>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {steps.map((s, i) => (
-            <div key={s.n} data-reveal className="reveal relative rounded-xl border border-border bg-card p-8" style={{ transitionDelay: `${i * 100}ms` }}>
+            <div key={s.n} data-reveal className="reveal relative overflow-hidden rounded-xl border border-border bg-card" style={{ transitionDelay: `${i * 100}ms` }}>
+              {stepDrawings[i] && <img src={stepDrawings[i].src} alt={stepDrawings[i].alt} width={1024} height={768} loading="lazy" className="aspect-[4/3] w-full border-b border-border object-cover" />}
+              <div className="p-8">
               <span className="font-mono text-sm font-semibold tracking-[0.06em] text-primary">STEP {s.n}</span>
               <h3 className="mt-3 text-xl font-semibold text-primary">{s.t}</h3>
               <p className="mt-2 text-muted-foreground">{s.d}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -349,6 +366,7 @@ function Index() {
       {/* FAQ */}
       {data.faqs.length > 0 && (
         <section id="faq" className="mx-auto max-w-3xl scroll-mt-24 px-6 py-24">
+          <img data-reveal src={faqDrawing} alt="Drawing of a nurse and a GP thinking, surrounded by question-mark speech bubbles" width={1280} height={640} loading="lazy" className="reveal mx-auto mb-10 w-full max-w-xl rounded-xl" />
           <div data-reveal className="reveal text-center"><Eyebrow>FAQ</Eyebrow></div>
           <h2 data-reveal className="reveal text-center font-display text-4xl text-primary md:text-5xl">Questions, answered</h2>
           <div className="mt-10 divide-y divide-border rounded-xl border border-border bg-card">
