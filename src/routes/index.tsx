@@ -1,12 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { getPublicContent } from "@/lib/content.functions";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { contentQuery } from "@/lib/content-query";
 import { btn, btnNavy, Eyebrow, SiteShell } from "@/components/site/shared";
 import { FeaturesSection, HowSection, FaqSection, ContactSection } from "@/components/site/sections";
 import teamDrawing from "@/assets/practice-team-drawing.jpg";
 import benefitsDrawing from "@/assets/benefits-drawing.jpg";
 
-export const contentQuery = queryOptions({ queryKey: ["public-content"], queryFn: () => getPublicContent() });
 
 
 export const Route = createFileRoute("/")({
