@@ -33,7 +33,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-7xl 2xl:max-w-[90rem] items-center justify-between px-6 lg:px-10 py-4">
           <Link to="/" aria-label="PracticeMD home"><Logo subtitle iconOnlyOnMobile /></Link>
           <nav className="flex items-center gap-6 text-sm">
             <Link to="/features" className={`hidden md:inline ${navLink}`} activeProps={navActive}>Features</Link>
@@ -45,7 +45,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
       </header>
       <main>{children}</main>
       <footer className="bg-primary py-10 text-primary-foreground">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-6 md:flex-row">
+        <div className="mx-auto flex max-w-7xl 2xl:max-w-[90rem] flex-col items-center justify-between gap-6 px-6 lg:px-10 md:flex-row">
           <Logo variant="white" />
           <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-primary-foreground/80">
             <Link to="/features" className="hover:text-primary-foreground">Features</Link>
