@@ -5,7 +5,8 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/brand/Logo";
 import { getPublicContent } from "@/lib/content.functions";
-import teamPhoto from "@/assets/practice-team.jpg";
+import teamDrawing from "@/assets/practice-team-drawing.jpg";
+import contactDrawing from "@/assets/contact-drawing.jpg";
 
 const contentQuery = queryOptions({ queryKey: ["public-content"], queryFn: () => getPublicContent() });
 
@@ -88,7 +89,8 @@ const useCases = [
   { t: "Clinical & admin leads", d: "Recalls, tasks and workloads at a glance, so nothing slips." },
 ];
 
-const tints = ["bg-sage text-sage-foreground", "bg-peach text-peach-foreground", "bg-sky text-sky-foreground"];
+const tints = ["bg-sage text-sage-foreground", "bg-peach text-peach-foreground", "bg-sky text-sky-foreground", "bg-blush text-blush-foreground"];
+const cardFills = ["bg-secondary", "bg-blush", "bg-card"];
 
 const features = [
   { tag: "Income", t: "QOF tracker", items: ["Points achieved vs available, by domain and indicator", "Patients still to treat, with recall lists", "Year‑end projection and prevalence trends", "PCAs and exception reporting overview"] },
@@ -120,13 +122,22 @@ function useReveal() {
   }, []);
 }
 
-const btn = "inline-flex items-center justify-center rounded-full bg-primary font-medium text-primary-foreground shadow-[var(--shadow-soft)] transition-all hover:-translate-y-0.5 hover:bg-accent";
-const btnGhost = "inline-flex items-center justify-center rounded-full border border-input bg-card font-medium text-primary transition-colors hover:bg-secondary";
+const btn = "inline-flex items-center justify-center rounded-full bg-primary font-medium text-primary-foreground transition-colors hover:bg-primary/90";
+const btnNavy = "inline-flex items-center justify-center rounded-full bg-navy font-medium text-navy-foreground transition-colors hover:bg-navy/90";
+const btnGhost = "inline-flex items-center justify-center rounded-full border border-primary bg-transparent font-medium text-primary transition-colors hover:bg-secondary";
+
+function Eyebrow({ children, dot = "bg-accent" }: { children: string; dot?: string }) {
+  return (
+    <p className="mb-4 inline-flex items-center gap-2 font-mono text-[0.8rem] font-semibold uppercase tracking-[0.06em] text-primary">
+      <span className={`h-1.5 w-1.5 rounded-full ${dot}`} /> {children}
+    </p>
+  );
+}
 
 function DashboardMock() {
   const bars = [40, 65, 52, 80, 70, 92, 60];
   return (
-    <div className="animate-float rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-lift)]" aria-hidden>
+    <div className="animate-float rounded-xl border border-border bg-card p-5" aria-hidden>
       <div className="flex items-center justify-between">
         <span className="font-display text-lg text-primary">This week</span>
         <span className="rounded-full bg-sage px-3 py-1 text-xs font-medium text-sage-foreground">On track</span>
@@ -134,7 +145,7 @@ function DashboardMock() {
       <div className="mt-4 grid grid-cols-3 gap-3">
         {[["Appointments", "1,284", "bg-secondary"], ["DNA rate", "3.1%", "bg-peach"], ["Staff cover", "96%", "bg-sky"]].map(([l, v, c]) => (
           <div key={l} className={`rounded-xl p-3 ${c}`}>
-            <p className="text-[0.65rem] uppercase tracking-wider text-muted-foreground">{l}</p>
+            <p className="font-mono text-[0.6rem] uppercase tracking-[0.06em] text-muted-foreground">{l}</p>
             <p className="mt-1 font-display text-xl text-primary">{v}</p>
           </div>
         ))}
@@ -217,11 +228,12 @@ function Index() {
 
       {/* Hero */}
       <section className="relative">
-        <div className="pointer-events-none absolute -right-40 -top-20 h-[32rem] w-[32rem] rounded-full bg-secondary blur-3xl" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-6 pb-20 pt-16 md:grid-cols-[1.1fr_1fr] md:pt-24">
+                <div className="relative mx-auto grid max-w-6xl items-center gap-14 px-6 pb-20 pt-16 md:grid-cols-[1.1fr_1fr] md:pt-24">
           <div className="animate-fade-up">
-            <p className="mb-6 inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-1.5 text-xs font-medium uppercase tracking-[0.2em] text-primary">
-              <span className="h-2 w-2 rounded-full bg-accent" /> For GP practices
+            <p className="mb-6 inline-flex flex-wrap items-center gap-2 rounded-full border border-input bg-secondary px-4 py-1.5 text-sm text-foreground">
+              <span className="text-accent" aria-hidden>✦</span>
+              <span className="font-mono text-xs font-semibold uppercase tracking-[0.06em] text-primary">For GP practices</span>
+              <span className="text-muted-foreground">Built to fit, not off the shelf.</span>
             </p>
             <h1 className="font-display text-5xl leading-[1.05] text-primary md:text-6xl lg:text-7xl">
               A dashboard shaped by <em className="text-accent">your</em> practice.
@@ -231,7 +243,7 @@ function Index() {
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <a href="#contact" className={`${btn} px-8 py-4`}>Tell us what you need</a>
-              <a href="#features" className={`${btnGhost} px-8 py-4`}>Explore features</a>
+              <a href="#features" className={`${btnNavy} px-8 py-4`}>Explore features</a>
             </div>
           </div>
           <div className="animate-fade-up [animation-delay:150ms]"><DashboardMock /></div>
@@ -239,10 +251,13 @@ function Index() {
       </section>
 
       {/* Trust strip */}
-      <section className="border-y border-border bg-card">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-10 gap-y-3 px-6 py-6 text-sm text-muted-foreground">
-          {["Designed for UK primary care", "Built to your workflow", "Secure by design", "Ongoing support"].map((t) => (
-            <span key={t} className="inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-accent" />{t}</span>
+      <section className="border-y border-input bg-blush">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-y-3 px-6 py-6 font-mono text-xs uppercase tracking-[0.06em] text-foreground sm:text-sm">
+          {[["UK", "primary care"], ["15+", "dashboard types"], ["Your", "workflow"], ["Ongoing", "support"]].map(([b, t], i) => (
+            <span key={t} className="inline-flex items-center">
+              {i > 0 && <span className="mx-4 h-4 w-px bg-rose sm:mx-6" aria-hidden />}
+              <span className="font-semibold text-primary">{b}</span>&nbsp;{t}
+            </span>
           ))}
         </div>
       </section>
@@ -250,12 +265,13 @@ function Index() {
       {/* Benefits */}
       <section className="mx-auto max-w-6xl px-6 py-24">
         <div data-reveal className="reveal max-w-2xl">
+          <Eyebrow>Why PracticeMD</Eyebrow>
           <h2 className="font-display text-4xl text-primary md:text-5xl">Less time searching. More time for patients.</h2>
           <p className="mt-4 text-lg text-muted-foreground">Every practice is different, so your dashboard should be too.</p>
         </div>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {benefits.map((f, i) => (
-            <div key={f.t} data-reveal className="reveal rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-soft)] transition-transform hover:-translate-y-1" style={{ transitionDelay: `${i * 100}ms` }}>
+            <div key={f.t} data-reveal className="reveal rounded-xl border border-border bg-card p-8" style={{ transitionDelay: `${i * 100}ms` }}>
               <span className={`inline-flex h-12 w-12 items-center justify-center rounded-full font-display text-2xl ${f.c}`}>0{i + 1}</span>
               <h3 className="mt-5 text-xl font-semibold text-primary">{f.t}</h3>
               <p className="mt-2 text-muted-foreground">{f.d}</p>
@@ -267,13 +283,14 @@ function Index() {
       {/* Photo + use cases */}
       <section className="bg-secondary">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-24 md:grid-cols-2">
-          <img data-reveal src={teamPhoto} alt="Practice manager reviewing a dashboard at a GP surgery reception" width={1280} height={960} loading="lazy" className="reveal aspect-[4/3] w-full rounded-2xl object-cover shadow-[var(--shadow-lift)]" />
+          <img data-reveal src={teamDrawing} alt="Drawing of a practice manager, GP and nurse looking at a practice dashboard together" width={1280} height={960} loading="lazy" className="reveal aspect-[4/3] w-full rounded-xl border border-border object-cover" />
           <div data-reveal className="reveal">
+            <Eyebrow dot="bg-navy">Who it's for</Eyebrow>
             <h2 className="font-display text-4xl text-primary md:text-5xl">Built for the people who run UK primary care</h2>
             <ul className="mt-8 space-y-5">
               {useCases.map((u) => (
                 <li key={u.t} className="flex gap-4">
-                  <span className="mt-1.5 h-3 w-3 shrink-0 rounded-full bg-accent" />
+                  <span className="mt-0.5 shrink-0 text-lg font-bold leading-none text-primary" aria-hidden>✓</span>
                   <div>
                     <p className="font-semibold text-primary">{u.t}</p>
                     <p className="text-muted-foreground">{u.d}</p>
@@ -288,19 +305,20 @@ function Index() {
       {/* Features for UK primary care */}
       <section id="features" className="scroll-mt-24">
         <div className="mx-auto max-w-6xl px-6 py-24">
+          <div data-reveal className="reveal"><Eyebrow>Features</Eyebrow></div>
           <h2 data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">Everything a UK practice runs on</h2>
           <p data-reveal className="reveal mt-4 max-w-2xl text-lg text-muted-foreground">
             Example dashboards we build for GP surgeries, PCNs and primary care teams. Pick what you need, and we shape it to your practice.
           </p>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f, i) => (
-              <article key={f.t} data-reveal className="reveal rounded-2xl border border-border bg-card p-7 shadow-[var(--shadow-soft)]" style={{ transitionDelay: `${(i % 3) * 80}ms` }}>
-                <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${tints[i % 3]}`}>{f.tag}</span>
+              <article key={f.t} data-reveal className={`reveal rounded-xl border border-border p-7 ${cardFills[i % 3]}`} style={{ transitionDelay: `${(i % 3) * 80}ms` }}>
+                <span className={`inline-block rounded-full px-3 py-1 font-mono text-[0.7rem] font-semibold uppercase tracking-[0.06em] ${tints[i % 4]}`}>{f.tag}</span>
                 <h3 className="mt-4 text-xl font-semibold text-primary">{f.t}</h3>
-                <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+                <ul className="mt-4 space-y-2 text-sm text-foreground/80">
                   {f.items.map((it) => (
                     <li key={it} className="flex gap-2">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                      <span className="shrink-0 font-bold text-primary" aria-hidden>✓</span>
                       <span>{it}</span>
                     </li>
                   ))}
@@ -312,13 +330,14 @@ function Index() {
       </section>
 
       {/* How it works */}
-      <section id="how" className="scroll-mt-24 bg-secondary">
+      <section id="how" className="scroll-mt-24 bg-blush">
         <div className="mx-auto max-w-6xl px-6 py-24">
+        <div data-reveal className="reveal"><Eyebrow dot="bg-rose">The process</Eyebrow></div>
         <h2 data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">How it works</h2>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {steps.map((s, i) => (
-            <div key={s.n} data-reveal className="reveal relative rounded-2xl border border-border bg-card p-8" style={{ transitionDelay: `${i * 100}ms` }}>
-              <span className="font-display text-5xl text-accent/40">{s.n}</span>
+            <div key={s.n} data-reveal className="reveal relative rounded-xl border border-border bg-card p-8" style={{ transitionDelay: `${i * 100}ms` }}>
+              <span className="font-mono text-sm font-semibold tracking-[0.06em] text-primary">STEP {s.n}</span>
               <h3 className="mt-3 text-xl font-semibold text-primary">{s.t}</h3>
               <p className="mt-2 text-muted-foreground">{s.d}</p>
             </div>
@@ -330,8 +349,9 @@ function Index() {
       {/* FAQ */}
       {data.faqs.length > 0 && (
         <section id="faq" className="mx-auto max-w-3xl scroll-mt-24 px-6 py-24">
+          <div data-reveal className="reveal text-center"><Eyebrow>FAQ</Eyebrow></div>
           <h2 data-reveal className="reveal text-center font-display text-4xl text-primary md:text-5xl">Questions, answered</h2>
-          <div className="mt-10 divide-y divide-border rounded-2xl border border-border bg-card">
+          <div className="mt-10 divide-y divide-border rounded-xl border border-border bg-card">
             {data.faqs.map((f) => (
               <div key={f.id}>
                 <button onClick={() => setOpen(open === f.id ? null : f.id)} className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-semibold text-primary" aria-expanded={open === f.id}>
@@ -351,16 +371,18 @@ function Index() {
       <section id="contact" className="scroll-mt-20 bg-secondary">
         <div className="mx-auto grid max-w-6xl gap-12 px-6 py-24 md:grid-cols-2">
           <div data-reveal className="reveal">
+            <Eyebrow>Contact</Eyebrow>
             <h2 className="font-display text-4xl text-primary md:text-5xl">Let's talk about your practice</h2>
             <p className="mt-4 text-lg text-muted-foreground">Share a few details and we'll get back to you to discuss what your dashboard could look like.</p>
+            <img src={contactDrawing} alt="Drawing of a friendly GP receptionist waving next to a calendar and checklist" width={1024} height={1024} loading="lazy" className="mt-10 hidden w-full max-w-sm rounded-xl border border-border md:block" />
           </div>
           {status === "done" ? (
-            <div className="rounded-2xl border border-border bg-card p-8 animate-fade-up">
+            <div className="rounded-xl border border-border bg-card p-8 animate-fade-up">
               <h3 className="text-xl font-semibold text-primary">Thank you!</h3>
               <p className="mt-2 text-muted-foreground">Your message has been received. We'll be in touch soon.</p>
             </div>
           ) : (
-            <form onSubmit={onSubmit} className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] md:p-8">
+            <form onSubmit={onSubmit} className="space-y-6 rounded-xl border border-border bg-card p-6 md:p-8">
               <fieldset className="space-y-4">
                 <legend className={legend}>About you</legend>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -385,7 +407,7 @@ function Index() {
                   {interestOptions.map((o) => (
                     <label key={o} className="cursor-pointer">
                       <input type="checkbox" name="interests" value={o} className="peer sr-only" />
-                      <span className="inline-block rounded-full border border-input bg-background px-3 py-1.5 text-sm text-muted-foreground transition-colors peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring">{o}</span>
+                      <span className="inline-block rounded-full border border-input bg-secondary px-3 py-1.5 text-sm text-muted-foreground transition-colors peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring">{o}</span>
                     </label>
                   ))}
                 </div>
