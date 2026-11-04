@@ -23,22 +23,56 @@ const contentQuery = queryOptions({ queryKey: ["public-content"], queryFn: () =>
 
 export const Route = createFileRoute("/")({
   staticData: { sitemap: true },
-  head: () => ({
+  head: ({ loaderData }) => {
+    const faqs = ((loaderData as unknown as { faqs?: { question: string; answer: string }[] } | undefined)?.faqs) ?? [];
+    return {
     meta: [
       { title: "PracticeMD — Practice management dashboards built for your practice" },
       { name: "description", content: "PracticeMD builds bespoke practice management dashboards tailored to how your GP practice actually works." },
+      { name: "robots", content: "index, follow, max-image-preview:large" },
       { property: "og:title", content: "PracticeMD — Bespoke practice dashboards" },
       { property: "og:description", content: "Custom practice management dashboards, built around your practice's needs." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:locale", content: "en_GB" },
       { property: "og:url", content: "https://practicemd.uk/" },
       { property: "og:image", content: "https://practicemd.uk/og-image.jpg" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "PracticeMD — custom practice management dashboards for UK GP practices" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "PracticeMD — Bespoke practice dashboards" },
+      { name: "twitter:description", content: "Custom practice management dashboards, built around your practice's needs." },
       { name: "twitter:image", content: "https://practicemd.uk/og-image.jpg" },
+      { name: "twitter:image:alt", content: "PracticeMD — custom practice management dashboards for UK GP practices" },
     ],
     links: [{ rel: "canonical", href: "https://practicemd.uk/" }],
-  }),
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify([
+          {
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            name: "PracticeMD",
+            url: "https://practicemd.uk/",
+            logo: "https://practicemd.uk/icon-512.png",
+            image: "https://practicemd.uk/og-image.jpg",
+            description: "Custom practice management dashboards tailored to the way each GP practice works.",
+            areaServed: { "@type": "Country", name: "United Kingdom" },
+          },
+          { "@context": "https://schema.org", "@type": "WebSite", name: "PracticeMD", url: "https://practicemd.uk/", inLanguage: "en-GB" },
+          ...(faqs.length
+            ? [{
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.question, acceptedAnswer: { "@type": "Answer", text: f.answer } })),
+              }]
+            : []),
+        ]),
+      },
+    ],
+  };
+  },
   loader: ({ context }) => context.queryClient.ensureQueryData(contentQuery),
   component: Index,
 });
