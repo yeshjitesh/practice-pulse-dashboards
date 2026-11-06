@@ -213,21 +213,28 @@
   --shadow-lift: 0 24px 60px -24px color-mix(in oklab, var(--primary) 35%, transparent);
 }
 
-@keyframes fade-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+/* Smooth motion: soft "ease-out-expo" curve, small distances, GPU-friendly transforms only */
+:root { --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1); --ease-wave: cubic-bezier(0.45, 0, 0.55, 1); }
+
+@keyframes fade-up { from { opacity: 0; transform: translate3d(0, 12px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+@keyframes float { 0%, 100% { transform: translate3d(0, 0, 0); } 50% { transform: translate3d(0, -6px, 0); } }
 @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 
-@utility animate-fade-up { animation: fade-up 0.7s ease-out both; }
-@utility animate-float { animation: float 6s ease-in-out infinite; }
-@utility animate-grow { transform-origin: bottom; animation: grow 0.8s ease-out both; }
+@utility animate-fade-up { animation: fade-up 0.9s var(--ease-smooth) both; }
+@utility animate-float { animation: float 7s var(--ease-wave) infinite; will-change: transform; backface-visibility: hidden; }
+@utility animate-grow { transform-origin: bottom; animation: grow 1s var(--ease-smooth) both; }
 @utility reveal {
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
-  &.is-visible { opacity: 1; transform: none; }
+  transform: translate3d(0, 14px, 0);
+  transition: opacity 0.9s var(--ease-smooth), transform 0.9s var(--ease-smooth);
+  will-change: opacity, transform;
+  &.is-visible { opacity: 1; transform: translate3d(0, 0, 0); will-change: auto; }
 }
+
+html { scroll-behavior: smooth; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up, .animate-float, .animate-grow { animation: none; }
   .reveal { opacity: 1; transform: none; transition: none; }
+  html { scroll-behavior: auto; }
 }
