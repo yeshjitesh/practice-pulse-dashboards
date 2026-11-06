@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { pageHead, breadcrumb } from "@/components/site/shared";
-import { LegalPage, CONTACT_EMAIL } from "@/components/site/LegalPage";
+import { legalSchema, LegalPage, CONTACT_EMAIL } from "@/components/site/LegalPage";
 
 export const Route = createFileRoute("/privacy")({
   staticData: { sitemap: true },
-  head: () => ({ ...pageHead("/privacy", "Privacy Policy | PracticeMD", "How PracticeMD collects, uses and protects your personal data under UK GDPR and the Data Protection Act 2018."), scripts: [breadcrumb("/privacy", "Privacy Policy")] }),
+  head: () => ({ ...pageHead("/privacy", "Privacy Policy | PracticeMD", "How PracticeMD collects, uses and protects your personal data under UK GDPR and the Data Protection Act 2018, and how to use your rights."), scripts: [legalSchema("/privacy", "Privacy Policy", "How PracticeMD collects, uses and protects your personal data under UK GDPR and the Data Protection Act 2018, and how to use your rights."), breadcrumb("/privacy", "Privacy Policy")] }),
   component: () => (
     <LegalPage eyebrow="Legal" title="Privacy Policy" intro="This policy explains how PracticeMD uses personal data, in line with the UK GDPR and the Data Protection Act 2018.">
       <section><h2>Who we are</h2><p>PracticeMD (practicemd.uk) is the data controller for personal data collected through this website. Contact us at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p></section>

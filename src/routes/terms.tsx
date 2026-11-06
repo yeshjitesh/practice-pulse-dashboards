@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { pageHead, breadcrumb } from "@/components/site/shared";
-import { LegalPage, CONTACT_EMAIL } from "@/components/site/LegalPage";
+import { legalSchema, LegalPage, CONTACT_EMAIL } from "@/components/site/LegalPage";
 
 export const Route = createFileRoute("/terms")({
   staticData: { sitemap: true },
-  head: () => ({ ...pageHead("/terms", "Terms of Use | PracticeMD", "The terms that apply when you use the PracticeMD website, governed by the law of England and Wales."), scripts: [breadcrumb("/terms", "Terms of Use")] }),
+  head: () => ({ ...pageHead("/terms", "Terms of Use | PracticeMD", "The terms that apply when you use the PracticeMD website for GP practice dashboards, governed by the law of England and Wales."), scripts: [legalSchema("/terms", "Terms of Use", "The terms that apply when you use the PracticeMD website for GP practice dashboards, governed by the law of England and Wales."), breadcrumb("/terms", "Terms of Use")] }),
   component: () => (
     <LegalPage eyebrow="Legal" title="Terms of Use" intro="These terms apply to your use of practicemd.uk. By using the site you accept them.">
       <section><h2>About us</h2><p>This website is run by PracticeMD. Contact: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p></section>
