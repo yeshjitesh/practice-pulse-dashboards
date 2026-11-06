@@ -19,3 +19,20 @@ export function LegalPage({ eyebrow, title, intro, children }: { eyebrow: string
     </SiteShell>
   );
 }
+
+export function legalSchema(path: string, name: string, description: string) {
+  return {
+    type: "application/ld+json",
+    children: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name,
+      description,
+      url: `https://practicemd.uk${path}`,
+      inLanguage: "en-GB",
+      dateModified: "2026-11-06",
+      isPartOf: { "@type": "WebSite", name: "PracticeMD", url: "https://practicemd.uk/" },
+      publisher: { "@type": "Organization", name: "PracticeMD", url: "https://practicemd.uk/" },
+    }),
+  };
+}
