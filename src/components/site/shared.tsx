@@ -52,6 +52,10 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <Link to="/how-it-works" className="hover:text-primary-foreground">How it works</Link>
             <Link to="/faq" className="hover:text-primary-foreground">FAQ</Link>
             <Link to="/contact" className="hover:text-primary-foreground">Contact</Link>
+            <Link to="/privacy" className="hover:text-primary-foreground">Privacy</Link>
+            <Link to="/cookies" className="hover:text-primary-foreground">Cookies</Link>
+            <Link to="/terms" className="hover:text-primary-foreground">Terms</Link>
+            <Link to="/accessibility" className="hover:text-primary-foreground">Accessibility</Link>
           </nav>
           <span className="text-sm text-primary-foreground/80">© {new Date().getFullYear()} PracticeMD · practicemd.uk</span>
         </div>
