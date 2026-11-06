@@ -4,10 +4,11 @@ import { Eyebrow, SiteShell } from "@/components/site/shared";
 export const LEGAL_UPDATED = "6 November 2026";
 export const CONTACT_EMAIL = "hello@practicemd.uk";
 
-export function LegalPage({ eyebrow, title, intro, children }: { eyebrow: string; title: string; intro: string; children: ReactNode }) {
+export function LegalPage({ eyebrow, title, intro, image, imageAlt, children }: { eyebrow: string; title: string; intro: string; image?: string; imageAlt?: string; children: ReactNode }) {
   return (
     <SiteShell>
       <article className="mx-auto max-w-3xl px-6 py-16 md:py-24">
+        {image && <img src={image} alt={imageAlt ?? ""} width={1024} height={768} className="mb-10 w-full rounded-xl border border-border animate-fade-up" />}
         <Eyebrow>{eyebrow}</Eyebrow>
         <h1 className="font-display text-4xl text-primary md:text-5xl">{title}</h1>
         <p className="mt-4 text-lg text-muted-foreground">{intro}</p>

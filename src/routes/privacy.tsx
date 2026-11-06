@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { pageHead, breadcrumb } from "@/components/site/shared";
+import drawing from "@/assets/privacy-drawing.jpg";
 import { legalSchema, LegalPage, CONTACT_EMAIL } from "@/components/site/LegalPage";
 
 export const Route = createFileRoute("/privacy")({
   staticData: { sitemap: true },
   head: () => ({ ...pageHead("/privacy", "Privacy Policy | PracticeMD", "How PracticeMD collects, uses and protects your personal data under UK GDPR and the Data Protection Act 2018, and how to use your rights."), scripts: [legalSchema("/privacy", "Privacy Policy", "How PracticeMD collects, uses and protects your personal data under UK GDPR and the Data Protection Act 2018, and how to use your rights."), breadcrumb("/privacy", "Privacy Policy")] }),
   component: () => (
-    <LegalPage eyebrow="Legal" title="Privacy Policy" intro="This policy explains how PracticeMD uses personal data, in line with the UK GDPR and the Data Protection Act 2018.">
+    <LegalPage image={drawing} imageAlt="Drawing of a smiling padlock and shield protecting a folder of documents" eyebrow="Legal" title="Privacy Policy" intro="This policy explains how PracticeMD uses personal data, in line with the UK GDPR and the Data Protection Act 2018.">
       <section><h2>Who we are</h2><p>PracticeMD (practicemd.uk) is the data controller for personal data collected through this website. Contact us at <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p></section>
       <section><h2>What we collect</h2><ul><li>Details you send through our contact form: name, email, phone, job role, practice or organisation, list size, clinical system and your message.</li><li>Account details (email and sign-in information) for site administrators only.</li><li>Basic technical data such as browser type and IP address, used to keep the site secure.</li></ul><p>We do not ask for, and you should not send, patient information through this website.</p></section>
       <section><h2>Why we use it and our lawful basis</h2><ul><li>To reply to your enquiry and discuss our services — legitimate interests, or steps before entering a contract.</li><li>To run and secure the website — legitimate interests.</li><li>To meet legal obligations, such as keeping business records.</li></ul><p>We do not sell your data or use it for automated decision-making.</p></section>

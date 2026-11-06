@@ -7,6 +7,7 @@ import stepChat from "@/assets/step-chat-drawing.jpg";
 import stepBuild from "@/assets/step-build-drawing.jpg";
 import stepGrow from "@/assets/step-grow-drawing.jpg";
 import faqDrawing from "@/assets/faq-drawing.jpg";
+import featuresDrawing from "@/assets/features-drawing.jpg";
 
 const stepDrawings = [
   { src: stepChat, alt: "Drawing of a practice manager and a GP talking over a notebook" },
@@ -99,11 +100,16 @@ export function FeaturesSection({ as: Tag = "h2" }: { as?: H }) {
   return (
       <section id="features" className="scroll-mt-24">
         <div className="mx-auto max-w-7xl 2xl:max-w-[90rem] px-6 lg:px-10 py-24">
+          <div className="grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)]">
+            <div>
           <div data-reveal className="reveal"><Eyebrow>Features</Eyebrow></div>
           <Tag data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">Everything a UK practice runs on</Tag>
           <p data-reveal className="reveal mt-4 max-w-2xl text-lg text-muted-foreground">
             Example dashboards we build for GP surgeries, PCNs and primary care teams. Pick what you need, and we shape it to your practice.
           </p>
+            </div>
+            <img data-reveal src={featuresDrawing} alt="Drawing of a laptop on a GP practice desk surrounded by dashboard cards: charts, a calendar, a staff rota and finances" width={1024} height={768} loading="lazy" className="reveal w-full rounded-xl border border-border" />
+          </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             {features.map((f, i) => (
               <article key={f.t} data-reveal className={`reveal rounded-xl border border-border p-7 ${cardFills[i % 3]}`} style={{ transitionDelay: `${(i % 3) * 80}ms` }}>
