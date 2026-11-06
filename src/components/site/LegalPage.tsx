@@ -1,0 +1,21 @@
+import type { ReactNode } from "react";
+import { Eyebrow, SiteShell } from "@/components/site/shared";
+
+export const LEGAL_UPDATED = "6 November 2026";
+export const CONTACT_EMAIL = "hello@practicemd.uk";
+
+export function LegalPage({ eyebrow, title, intro, children }: { eyebrow: string; title: string; intro: string; children: ReactNode }) {
+  return (
+    <SiteShell>
+      <article className="mx-auto max-w-3xl px-6 py-16 md:py-24">
+        <Eyebrow>{eyebrow}</Eyebrow>
+        <h1 className="font-display text-4xl text-primary md:text-5xl">{title}</h1>
+        <p className="mt-4 text-lg text-muted-foreground">{intro}</p>
+        <p className="mt-2 font-mono text-xs uppercase tracking-[0.06em] text-muted-foreground">Last updated: {LEGAL_UPDATED}</p>
+        <div className="mt-10 space-y-8 text-foreground [&_a]:text-primary [&_a]:underline [&_h2]:font-display [&_h2]:text-2xl [&_h2]:text-primary [&_li]:mt-1 [&_p]:mt-3 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-6">
+          {children}
+        </div>
+      </article>
+    </SiteShell>
+  );
+}
