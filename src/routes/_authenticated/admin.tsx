@@ -280,7 +280,7 @@ function Chats() {
           {openId === c.id && (
             <div className="mt-4 space-y-2 border-t border-border pt-4 text-sm">
               {msgs.data?.map((m) => (
-                <p key={m.id} className="whitespace-pre-wrap"><span className={`font-medium ${m.role === "user" ? "text-primary" : "text-muted-foreground"}`}>{m.role === "user" ? "Visitor" : "Pip"}:</span> {m.content}</p>
+                <p key={m.id} className="whitespace-pre-wrap"><span className={`font-medium ${m.role === "user" ? "text-primary" : "text-muted-foreground"}`}>{m.role === "user" ? "Visitor" : "NEXA"}:</span> {m.content}</p>
               ))}
             </div>
           )}
