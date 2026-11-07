@@ -25,12 +25,12 @@ function DemosPage() {
   const [bar, setBar] = useState<number | null>(null);
   const [item, setItem] = useState<number | null>(null);
   const vary = (v: number, i: number) => (period === 0 ? v : Math.round(v * (1 + 0.12 * Math.sin(i * 1.7 + period * 2.3))));
+  const pct = d.chartTitle.includes("%");
   const bars = d.bars.map(([l, v], i) => [l, pct ? Math.min(100, vary(v, i)) : vary(v, i)] as const);
   const list = d.list.map(([l, v, c], i) => [l, Math.min(100, Math.round(vary(v, i + 3))), c] as const);
   const max = Math.max(...bars.map(([, v]) => v));
   const pick = (id: string) => { if (id === active) return; setActive(id); setBar(null); setItem(null); window.__lovableEvents?.track?.("project.demo_opened", { demo: id, location: "demos_page" }); };
   const used = (control: string) => window.__lovableEvents?.track?.("project.demo_control_used", { demo: d.id, control, location: "demos_page" });
-  const pct = d.chartTitle.includes("%");
   return (
     <SiteShell>
       <section className="mx-auto max-w-7xl 2xl:max-w-[90rem] px-6 lg:px-10 py-16 md:py-24">
