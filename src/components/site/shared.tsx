@@ -37,6 +37,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <Link to="/" aria-label="PracticeMD home"><Logo subtitle iconOnlyOnMobile /></Link>
           <nav className="flex items-center gap-6 text-sm">
             <Link to="/features" className={`hidden md:inline ${navLink}`} activeProps={navActive}>Features</Link>
+            <Link to="/demos" className={`hidden md:inline ${navLink}`} activeProps={navActive}>Demos</Link>
             <Link to="/how-it-works" className={`hidden md:inline ${navLink}`} activeProps={navActive}>How it works</Link>
             <Link to="/faq" className={`hidden md:inline ${navLink}`} activeProps={navActive}>FAQ</Link>
             <Link to="/contact" className={`${btn} px-5 py-2`}>Get in touch</Link>
@@ -49,6 +50,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <Logo variant="white" />
           <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-primary-foreground/80">
             <Link to="/features" className="hover:text-primary-foreground">Features</Link>
+            <Link to="/demos" className="hover:text-primary-foreground">Demos</Link>
             <Link to="/how-it-works" className="hover:text-primary-foreground">How it works</Link>
             <Link to="/faq" className="hover:text-primary-foreground">FAQ</Link>
             <Link to="/contact" className="hover:text-primary-foreground">Contact</Link>
