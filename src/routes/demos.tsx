@@ -47,7 +47,7 @@ function DemosPage() {
   const [period, setPeriod] = useState(0);
   const [bar, setBar] = useState<number | null>(null);
   const [item, setItem] = useState<number | null>(null);
-  const vary = (v: number, i: number) => (period === 0 ? v : Math.round(v * (1 + 0.12 * Math.sin(i * 1.7 + period * 2.3)) * 10) / 10);
+  const vary = (v: number, i: number) => (period === 0 ? v : Math.round(v * (1 + 0.12 * Math.sin(i * 1.7 + period * 2.3))));
   const bars = d.bars.map(([l, v], i) => [l, vary(v, i)] as const);
   const list = d.list.map(([l, v, c], i) => [l, Math.min(100, Math.round(vary(v, i + 3))), c] as const);
   const max = Math.max(...bars.map(([, v]) => v));
