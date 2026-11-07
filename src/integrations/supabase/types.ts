@@ -14,6 +14,65 @@ export type Database = {
   }
   public: {
     Tables: {
+      chat_conversations: {
+        Row: {
+          contact_submission_id: string | null
+          created_at: string
+          id: string
+          live_agent_requested: boolean
+          updated_at: string
+          visitor_token: string
+        }
+        Insert: {
+          contact_submission_id?: string | null
+          created_at?: string
+          id?: string
+          live_agent_requested?: boolean
+          updated_at?: string
+          visitor_token: string
+        }
+        Update: {
+          contact_submission_id?: string | null
+          created_at?: string
+          id?: string
+          live_agent_requested?: boolean
+          updated_at?: string
+          visitor_token?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       contact_submissions: {
         Row: {
           clinical_system: string | null
