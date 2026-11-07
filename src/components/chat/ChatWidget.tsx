@@ -1,13 +1,13 @@
+import nexaIcon from "@/assets/nexa-icon.png";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useServerFn } from "@tanstack/react-start";
-import { MessageCircle, X, Send, UserRound } from "lucide-react";
-import { LogoIcon } from "@/components/brand/Logo";
+import { X, Send, UserRound } from "lucide-react";
 import { getChatHistory, sendChatMessage } from "@/lib/chat.functions";
 
 type Msg = { role: "user" | "assistant"; content: string };
 const KEY = "pmd-chat-token";
-const GREETING: Msg = { role: "assistant", content: "Hi, I'm **Pip** from PracticeMD 👋 Ask me anything about practice dashboards — or say *\"talk to a person\"* and I'll get the team to contact you." };
+const GREETING: Msg = { role: "assistant", content: "Hi, I'm **NEXA** from PracticeMD 👋 Ask me anything about practice dashboards — or say *\"talk to a person\"* and I'll get the team to contact you." };
 
 function getToken() {
   let t = localStorage.getItem(KEY);
@@ -55,7 +55,7 @@ export function ChatWidget() {
       {!open && (
         <button onClick={() => setOpen(true)} aria-label="Chat with PracticeMD"
           className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg hover:bg-primary/90">
-          <MessageCircle className="h-5 w-5" /> Chat with us
+          <img src={nexaIcon} alt="" width={28} height={28} className="h-7 w-7 rounded-full bg-background" /> Chat with us now
         </button>
       )}
       {open && (
@@ -63,8 +63,8 @@ export function ChatWidget() {
           className="fixed inset-x-3 bottom-3 top-20 z-40 flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl sm:inset-auto sm:bottom-5 sm:right-5 sm:h-[600px] sm:w-[400px]">
           <div className="flex items-center justify-between bg-primary px-4 py-3 text-primary-foreground">
             <div className="flex items-center gap-3">
-              <LogoIcon className="h-8 w-8" variant="white" />
-              <div><p className="font-display text-lg leading-none">Pip</p><p className="text-xs opacity-80">PracticeMD assistant · usually replies instantly</p></div>
+              <img src={nexaIcon} alt="NEXA" width={36} height={36} className="h-9 w-9 rounded-full bg-background p-0.5" />
+              <div><p className="font-display text-lg leading-none">NEXA</p><p className="text-xs opacity-80">PracticeMD assistant · usually replies instantly</p></div>
             </div>
             <button onClick={() => setOpen(false)} aria-label="Close chat" className="rounded-full p-1 hover:bg-primary-foreground/10"><X className="h-5 w-5" /></button>
           </div>
@@ -74,7 +74,7 @@ export function ChatWidget() {
             ) : (
               <div key={i} className="prose prose-sm max-w-[92%] text-sm text-foreground [&_a]:text-primary [&_p]:my-1 [&_ul]:my-1"><ReactMarkdown>{m.content}</ReactMarkdown></div>
             ))}
-            {busy && <div className="flex gap-1 py-2" aria-label="Pip is typing">{[0,1,2].map((d) => <span key={d} className="h-2 w-2 animate-bounce rounded-full bg-accent" style={{ animationDelay: `${d * 150}ms` }} />)}</div>}
+            {busy && <div className="flex gap-1 py-2" aria-label="NEXA is typing">{[0,1,2].map((d) => <span key={d} className="h-2 w-2 animate-bounce rounded-full bg-accent" style={{ animationDelay: `${d * 150}ms` }} />)}</div>}
             {msgs.length === 0 && !busy && (
               <div className="flex flex-wrap gap-2 pt-1">
                 {["What dashboards can you build?", "How does it work?", "Book a free chat"].map((s) => (
