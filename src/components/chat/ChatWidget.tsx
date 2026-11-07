@@ -63,7 +63,7 @@ export function ChatWidget() {
           className="fixed inset-x-3 bottom-3 top-20 z-40 flex flex-col overflow-hidden rounded-2xl border border-border bg-background shadow-2xl sm:inset-auto sm:bottom-5 sm:right-5 sm:h-[600px] sm:w-[400px]">
           <div className="flex items-center justify-between bg-primary px-4 py-3 text-primary-foreground">
             <div className="flex items-center gap-3">
-              <LogoIcon className="h-8 w-8" />
+              <LogoIcon className="h-8 w-8" variant="white" />
               <div><p className="font-display text-lg leading-none">Pip</p><p className="text-xs opacity-80">PracticeMD assistant · usually replies instantly</p></div>
             </div>
             <button onClick={() => setOpen(false)} aria-label="Close chat" className="rounded-full p-1 hover:bg-primary-foreground/10"><X className="h-5 w-5" /></button>
