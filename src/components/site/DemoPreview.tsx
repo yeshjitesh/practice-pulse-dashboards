@@ -19,7 +19,7 @@ export function DemoPreview() {
           <p className="mt-4 text-lg text-muted-foreground">Have a play with real-looking sample dashboards. Tap the tabs to switch — there are 15 to explore.</p>
           <div role="tablist" aria-label="Featured demos" className="mt-8 flex flex-wrap gap-2">
             {list.map((x) => (
-              <button key={x.id} role="tab" aria-selected={x.id === id} onClick={() => setId(x.id)}
+              <button key={x.id} role="tab" aria-selected={x.id === id} onClick={() => { if (x.id === id) return; setId(x.id); window.__lovableEvents?.track?.("project.demo_opened", { demo: x.id, location: "home" }); }}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${x.id === id ? "bg-primary text-primary-foreground" : "border border-input bg-card text-foreground hover:bg-secondary"}`}>
                 {x.name}
               </button>

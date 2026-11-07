@@ -199,7 +199,10 @@ export function ContactSection({ as: Tag = "h2" }: { as?: H }) {
       contact_preference: opt("contact_preference"), heard_about: opt("heard_about"),
       interests: fd.getAll("interests").map(String),
     });
-    if (!parsed.success) return setError(parsed.error.issues[0]?.message ?? "Please check the form");
+    if (!parsed.success) {
+      window.__lovableEvents?.track?.("project.contact_form_submitted", { result: "invalid" });
+      return setError(parsed.error.issues[0]?.message ?? "Please check the form");
+    }
     setStatus("sending");
     const d = parsed.data;
     const { error } = await supabase.from("contact_submissions").insert({
@@ -218,9 +221,11 @@ export function ContactSection({ as: Tag = "h2" }: { as?: H }) {
       heard_about: d.heard_about ?? null,
     });
     if (error) {
+      window.__lovableEvents?.track?.("project.contact_form_submitted", { result: "error" });
       setStatus("idle");
       return setError("Something went wrong. Please try again.");
     }
+    window.__lovableEvents?.track?.("project.contact_form_submitted", { result: "success" });
     form.reset();
     setStatus("done");
   }
