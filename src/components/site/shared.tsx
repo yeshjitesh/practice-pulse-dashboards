@@ -1,3 +1,4 @@
+import { ChatWidget } from "@/components/chat/ChatWidget";
 import { useEffect, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
@@ -45,6 +46,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main>{children}</main>
+      <ChatWidget />
       <footer className="bg-primary py-10 text-primary-foreground">
         <div className="mx-auto flex max-w-7xl 2xl:max-w-[90rem] flex-col items-center justify-between gap-6 px-6 lg:px-10 md:flex-row">
           <Logo variant="white" />

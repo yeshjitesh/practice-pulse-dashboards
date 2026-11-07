@@ -19,7 +19,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   component: Admin,
 });
 
-type Tab = "messages" | "testimonials" | "faqs";
+type Tab = "messages" | "chats" | "testimonials" | "faqs";
 
 function Admin() {
   const { user } = Route.useRouteContext();
@@ -60,8 +60,8 @@ function Admin() {
         ) : (
           <>
             <h1 className="font-display text-4xl text-primary">Admin</h1>
-            <div className="mt-6 flex gap-2">
-              {(["messages", "testimonials", "faqs"] as Tab[]).map((t) => (
+            <div className="mt-6 flex flex-wrap gap-2">
+              {(["messages", "chats", "testimonials", "faqs"] as Tab[]).map((t) => (
                 <button key={t} onClick={() => setTab(t)} className={`rounded-full px-4 py-2 text-sm font-medium capitalize transition-colors ${tab === t ? "bg-primary text-primary-foreground" : "bg-card text-foreground hover:bg-background"}`}>
                   {t === "faqs" ? "FAQs" : t}
                 </button>
@@ -69,6 +69,7 @@ function Admin() {
             </div>
             <div className="mt-6">
               {tab === "messages" && <Messages />}
+              {tab === "chats" && <Chats />}
               {tab === "testimonials" && <Testimonials />}
               {tab === "faqs" && <Faqs />}
             </div>
@@ -234,6 +235,54 @@ function Faqs() {
                 <button onClick={() => remove(x.id)} className={`${small} text-destructive`}>Delete</button>
               </div>
             </>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Chats() {
+  const qc = useQueryClient();
+  const [openId, setOpenId] = useState<string | null>(null);
+  const q = useQuery({
+    queryKey: ["admin-chats"],
+    queryFn: async () => (await supabase.from("chat_conversations").select("id, live_agent_requested, created_at, updated_at, chat_messages(count)").order("updated_at", { ascending: false })).data ?? [],
+  });
+  const msgs = useQuery({
+    queryKey: ["admin-chat", openId],
+    enabled: !!openId,
+    queryFn: async () => (await supabase.from("chat_messages").select("id, role, content, created_at").eq("conversation_id", openId!).order("created_at")).data ?? [],
+  });
+  async function remove(id: string) {
+    if (!confirm("Delete this conversation?")) return;
+    const { error } = await supabase.from("chat_conversations").delete().eq("id", id);
+    if (error) toast.error("Couldn't delete"); else { toast.success("Deleted"); if (openId === id) setOpenId(null); qc.invalidateQueries({ queryKey: ["admin-chats"] }); }
+  }
+  if (q.isLoading) return <p className="text-muted-foreground">Loading…</p>;
+  if (!q.data?.length) return <div className={card}><p className="text-muted-foreground">No chatbot conversations yet.</p></div>;
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">Live-agent requests from the chat also appear in Messages.</p>
+      {q.data.map((c) => (
+        <div key={c.id} className={card}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="text-sm">
+              <span className="font-medium">{new Date(c.updated_at).toLocaleString("en-GB")}</span>
+              <span className="ml-2 text-muted-foreground">{(c.chat_messages as unknown as { count: number }[])?.[0]?.count ?? 0} messages</span>
+              {c.live_agent_requested && <span className={`${small} ml-2 bg-accent text-accent-foreground`}>Wants contact</span>}
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setOpenId(openId === c.id ? null : c.id)} className={`${small} border border-input`}>{openId === c.id ? "Hide" : "View"}</button>
+              <button onClick={() => remove(c.id)} className={`${small} border border-input text-destructive`}>Delete</button>
+            </div>
+          </div>
+          {openId === c.id && (
+            <div className="mt-4 space-y-2 border-t border-border pt-4 text-sm">
+              {msgs.data?.map((m) => (
+                <p key={m.id} className="whitespace-pre-wrap"><span className={`font-medium ${m.role === "user" ? "text-primary" : "text-muted-foreground"}`}>{m.role === "user" ? "Visitor" : "Pip"}:</span> {m.content}</p>
+              ))}
+            </div>
           )}
         </div>
       ))}
