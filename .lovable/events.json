@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "events": {
+    "project.contact_form_submitted": {
+      "event_schema_version": 1,
+      "description": "A visitor pressed send on the contact form; result says whether it was saved, failed, or had missing fields.",
+      "privacy": {
+        "contains_pii": false,
+        "purpose": "product_analytics"
+      },
+      "properties_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "string",
+            "enum": [
+              "success",
+              "error",
+              "invalid"
+            ]
+          }
+        }
+      }
+    },
+    "project.demo_control_used": {
+      "event_schema_version": 1,
+      "description": "A visitor used a control inside a demo dashboard: time period switch, chart bar or breakdown row.",
+      "privacy": {
+        "contains_pii": false,
+        "purpose": "product_analytics"
+      },
+      "properties_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "demo",
+          "control",
+          "location"
+        ],
+        "properties": {
+          "demo": {
+            "type": "string"
+          },
+          "control": {
+            "type": "string",
+            "enum": [
+              "period",
+              "bar",
+              "breakdown"
+            ]
+          },
+          "location": {
+            "type": "string",
+            "enum": [
+              "demos_page",
+              "home"
+            ]
+          }
+        }
+      }
+    },
+    "project.demo_opened": {
+      "event_schema_version": 1,
+      "description": "A visitor switched to a demo dashboard (on the Demos page or the home page preview).",
+      "privacy": {
+        "contains_pii": false,
+        "purpose": "product_analytics"
+      },
+      "properties_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "demo",
+          "location"
+        ],
+        "properties": {
+          "demo": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string",
+            "enum": [
+              "demos_page",
+              "home"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
