@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { contentQuery } from "@/lib/content-query";
 import { btn, btnNavy, Eyebrow, SiteShell } from "@/components/site/shared";
+import { DemoPreview, CtaBand } from "@/components/site/DemoPreview";
 import { FeaturesSection, HowSection, FaqSection, ContactSection } from "@/components/site/sections";
 import teamDrawing from "@/assets/practice-team-drawing.jpg";
 import benefitsDrawing from "@/assets/benefits-drawing.jpg";
@@ -121,9 +122,10 @@ function Index() {
               PracticeMD designs and builds custom practice management dashboards — tailored to the way your team works and the numbers you care about.
             </p>
             <div className="mt-10 grid gap-3 sm:flex sm:flex-wrap">
-              <Link to="/contact" className={`${btn} px-8 py-4`}>Tell us what you need</Link>
-              <Link to="/features" className={`${btnNavy} px-8 py-4`}>Explore features</Link>
+              <Link to="/contact" className={`${btn} px-8 py-4`}>Book a free chat</Link>
+              <Link to="/demos" className={`${btnNavy} px-8 py-4`}>Try a demo dashboard</Link>
             </div>
+            <p className="mt-5 text-sm text-muted-foreground">Free, no-obligation · We reply within one working day</p>
           </div>
           <div className="animate-fade-up [animation-delay:150ms]"><DashboardMock /></div>
         </div>
@@ -183,8 +185,10 @@ function Index() {
           </div>
         </div>
       </section>
+      <DemoPreview />
       <FeaturesSection />
       <HowSection />
+      <CtaBand />
       <FaqSection faqs={data.faqs} />
       <ContactSection />
     </SiteShell>
