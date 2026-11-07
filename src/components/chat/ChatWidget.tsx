@@ -53,10 +53,16 @@ export function ChatWidget() {
   return (
     <>
       {!open && (
-        <button onClick={() => setOpen(true)} aria-label="Chat with PracticeMD"
-          className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground shadow-lg hover:bg-primary/90">
-          <img src={nexaIcon} alt="" width={28} height={28} className="h-7 w-7 rounded-full bg-background" /> Chat with us now
-        </button>
+        <div className="fixed bottom-5 right-5 z-40 flex items-center gap-2">
+          <button onClick={() => setOpen(true)} tabIndex={-1} aria-hidden="true"
+            className="animate-[fade-up_0.5s_ease-out_1.5s_both] relative rounded-full rounded-br-sm border border-border bg-background px-3 py-1.5 text-xs font-medium text-primary shadow-md">
+            Chat with us
+          </button>
+          <button onClick={() => setOpen(true)} aria-label="Chat with PracticeMD"
+            className="flex h-14 w-14 items-center justify-center rounded-full border border-border bg-background shadow-lg transition-transform hover:scale-105">
+            <img src={nexaIcon} alt="" width={44} height={44} className="h-11 w-11" />
+          </button>
+        </div>
       )}
       {open && (
         <div role="dialog" aria-label="PracticeMD chat"
