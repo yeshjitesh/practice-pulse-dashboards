@@ -2,6 +2,7 @@ import { ChatWidget } from "@/components/chat/ChatWidget";
 import { useEffect, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
+import { CookieBanner, openCookieSettings } from "@/components/site/CookieBanner";
 
 export const btn = "inline-flex items-center justify-center rounded-full bg-primary font-medium text-primary-foreground transition-colors hover:bg-primary/90";
 export const btnNavy = "inline-flex items-center justify-center rounded-full bg-navy font-medium text-navy-foreground transition-colors hover:bg-navy/90";
@@ -47,6 +48,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
       </header>
       <main>{children}</main>
       <ChatWidget />
+      <CookieBanner />
       <footer className="bg-primary py-10 text-primary-foreground">
         <div className="mx-auto flex max-w-7xl 2xl:max-w-[90rem] flex-col items-center justify-between gap-6 px-6 lg:px-10 md:flex-row">
           <Logo variant="white" />
@@ -60,6 +62,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <Link to="/cookies" className="hover:text-primary-foreground">Cookies</Link>
             <Link to="/terms" className="hover:text-primary-foreground">Terms</Link>
             <Link to="/accessibility" className="hover:text-primary-foreground">Accessibility</Link>
+            <button type="button" onClick={openCookieSettings} className="hover:text-primary-foreground">Cookie settings</button>
           </nav>
           <span className="text-sm text-primary-foreground/80">© {new Date().getFullYear()} PracticeMD · practicemd.uk</span>
         </div>
