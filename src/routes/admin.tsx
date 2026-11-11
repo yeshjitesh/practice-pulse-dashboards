@@ -49,11 +49,6 @@ function Admin() {
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-6 py-10">
-            <h1 className="font-display text-2xl text-primary">No admin access</h1>
-            <p className="mt-2 text-muted-foreground">This account isn't an admin of this site.</p>
-          </div>
-        ) : (
-          <>
             <h1 className="font-display text-4xl text-primary">Admin</h1>
             <div className="mt-6 flex flex-wrap gap-2">
               {(["messages", "chats", "testimonials", "faqs"] as Tab[]).map((t) => (
