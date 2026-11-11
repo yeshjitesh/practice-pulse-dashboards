@@ -29,6 +29,13 @@
       "when": 1794060844661,
       "tag": "0003_chatbot",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794436555689,
+      "tag": "0004_retire_first_signup_admin",
+      "breakpoints": true
     }
   ]
 }
