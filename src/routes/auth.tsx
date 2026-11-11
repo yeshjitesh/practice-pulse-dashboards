@@ -1,80 +1,55 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
+import { useState, type FormEvent } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { unlockAdmin } from "@/lib/admin.functions";
 import { Logo } from "@/components/brand/Logo";
+import { Button } from "@/components/ui/button";
+import { LockKeyhole } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
   staticData: { sitemap: false },
-  head: () => ({
-    meta: [
-      { title: "Sign in — PracticeMD" },
-      { name: "description", content: "Sign in to manage your PracticeMD site." },
-      { property: "og:title", content: "Sign in — PracticeMD" },
-      { property: "og:description", content: "Admin sign in for PracticeMD." },
-      { name: "robots", content: "noindex" },
-    ],
-  }),
+  head: () => ({ meta: [
+    { title: "Admin access — PracticeMD" },
+    { name: "description", content: "Private access to the PracticeMD administration area." },
+    { property: "og:title", content: "Admin access — PracticeMD" },
+    { property: "og:description", content: "Private PracticeMD administration access." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+    { name: "robots", content: "noindex" },
+  ] }),
   component: AuthPage,
 });
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"in" | "up">("in");
+  const unlock = useServerFn(unlockAdmin);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/admin", replace: true });
-    });
-    const { data } = supabase.auth.onAuthStateChange((e, s) => {
-      if (e === "SIGNED_IN" && s) navigate({ to: "/admin", replace: true });
-    });
-    return () => data.subscription.unsubscribe();
-  }, [navigate]);
-
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setMsg("");
-    setBusy(true);
-    const f = new FormData(e.currentTarget);
-    const email = String(f.get("email"));
-    const password = String(f.get("password"));
-    const { error, data } =
-      mode === "in"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + "/auth" } });
-    setBusy(false);
-    if (error) return setMsg(error.message);
-    if (mode === "up" && !data.session) setMsg("Check your email to confirm your account, then sign in.");
+    const code = String(new FormData(e.currentTarget).get("code") ?? "");
+    setMsg(""); setBusy(true);
+    try {
+      const result = await unlock({ data: { code } });
+      if (result.ok) await navigate({ to: "/admin", replace: true });
+      else setMsg("Incorrect access code.");
+    } catch { setMsg("Couldn't unlock the admin area. Please try again."); }
+    finally { setBusy(false); }
   }
-
-  const input = "w-full rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-accent focus:ring-2 focus:ring-ring/30";
   return (
-    <div className="flex min-h-screen items-center justify-center bg-secondary px-4">
-      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-soft)]">
+    <main className="flex min-h-screen items-center justify-center bg-secondary px-4">
+      <div className="w-full max-w-md rounded-lg border border-border bg-card p-8">
         <Link to="/"><Logo /></Link>
-        <h1 className="mt-6 font-display text-3xl text-primary">{mode === "in" ? "Welcome back" : "Create admin account"}</h1>
-        <button
-          onClick={() => lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" })}
-          className="mt-6 w-full rounded-full border border-input bg-background py-3 font-medium transition-colors hover:bg-secondary"
-        >
-          Continue with Google
-        </button>
-        <div className="my-5 text-center text-xs uppercase tracking-widest text-muted-foreground">or</div>
-        <form onSubmit={submit} className="space-y-3">
-          <input name="email" type="email" required placeholder="Email" className={input} />
-          <input name="password" type="password" required minLength={8} placeholder="Password" className={input} />
-          {msg && <p className="text-sm text-muted-foreground">{msg}</p>}
-          <button disabled={busy} className="w-full rounded-full bg-primary py-3 font-medium text-primary-foreground transition-colors hover:bg-accent disabled:opacity-60">
-            {busy ? "Please wait…" : mode === "in" ? "Sign in" : "Sign up"}
-          </button>
+        <LockKeyhole className="mt-8 size-6 text-primary" />
+        <h1 className="mt-3 font-display text-3xl text-primary">Admin access</h1>
+        <form onSubmit={submit} className="mt-6 space-y-4">
+          <label htmlFor="access-code" className="block text-sm font-medium">Access code</label>
+          <input id="access-code" name="code" type="password" required maxLength={256} autoComplete="current-password" className="w-full rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-accent focus:ring-2 focus:ring-ring/30" />
+          {msg && <p role="alert" className="text-sm text-destructive">{msg}</p>}
+          <Button type="submit" variant="brand" disabled={busy} className="h-12 w-full">{busy ? "Please wait…" : "Unlock admin"}</Button>
         </form>
-        <button onClick={() => setMode(mode === "in" ? "up" : "in")} className="mt-4 text-sm text-accent hover:underline">
-          {mode === "in" ? "No account yet? Sign up" : "Have an account? Sign in"}
-        </button>
+        <Button asChild variant="link" className="mt-4 px-0"><Link to="/">Back to PracticeMD</Link></Button>
       </div>
-    </div>
+    </main>
   );
 }

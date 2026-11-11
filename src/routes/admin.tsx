@@ -2,11 +2,14 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { getAdminData, changeAdminData, lockAdmin } from "@/lib/admin.functions";
+import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/Logo";
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/admin")({
   staticData: { sitemap: false },
+  loader: () => getAdminData(),
   head: () => ({
     meta: [
       { title: "Admin — PracticeMD" },
@@ -14,6 +17,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { property: "og:title", content: "Admin — PracticeMD" },
       { property: "og:description", content: "PracticeMD admin area." },
       { name: "robots", content: "noindex" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Admin,
@@ -22,20 +27,15 @@ export const Route = createFileRoute("/_authenticated/admin")({
 type Tab = "messages" | "chats" | "testimonials" | "faqs";
 
 function Admin() {
-  const { user } = Route.useRouteContext();
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const lock = useServerFn(lockAdmin);
   const [tab, setTab] = useState<Tab>("messages");
-  const role = useQuery({
-    queryKey: ["is-admin", user.id],
-    queryFn: async () => (await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" })).data === true,
-  });
-
   async function signOut() {
+    await lock();
     await qc.cancelQueries();
     qc.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
+    await navigate({ to: "/auth", replace: true });
   }
 
   return (
@@ -44,27 +44,17 @@ function Admin() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link to="/"><Logo iconOnlyOnMobile /></Link>
           <div className="flex items-center gap-4 text-sm">
-            <span className="hidden text-muted-foreground sm:inline">{user.email}</span>
-            <button onClick={signOut} className="rounded-full border border-input px-4 py-2 hover:bg-secondary">Sign out</button>
+            <Button variant="ghost" onClick={signOut} className="rounded-full border border-input px-4 py-2 hover:bg-secondary">Sign out</Button>
           </div>
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-6 py-10">
-        {role.isLoading ? (
-          <p className="text-muted-foreground">Loading…</p>
-        ) : !role.data ? (
-          <div className="rounded-xl border border-border bg-card p-8">
-            <h1 className="font-display text-2xl text-primary">No admin access</h1>
-            <p className="mt-2 text-muted-foreground">This account isn't an admin of this site.</p>
-          </div>
-        ) : (
-          <>
             <h1 className="font-display text-4xl text-primary">Admin</h1>
             <div className="mt-6 flex flex-wrap gap-2">
               {(["messages", "chats", "testimonials", "faqs"] as Tab[]).map((t) => (
-                <button key={t} onClick={() => setTab(t)} className={`rounded-full px-4 py-2 text-sm font-medium capitalize transition-colors ${tab === t ? "bg-primary text-primary-foreground" : "bg-card text-foreground hover:bg-background"}`}>
+                <Button variant="ghost" key={t} onClick={() => setTab(t)} className={`rounded-full px-4 py-2 text-sm font-medium capitalize transition-colors ${tab === t ? "bg-primary text-primary-foreground" : "bg-card text-foreground hover:bg-background"}`}>
                   {t === "faqs" ? "FAQs" : t}
-                </button>
+                </Button>
               ))}
             </div>
             <div className="mt-6">
@@ -73,8 +63,6 @@ function Admin() {
               {tab === "testimonials" && <Testimonials />}
               {tab === "faqs" && <Faqs />}
             </div>
-          </>
-        )}
       </main>
     </div>
   );
@@ -86,19 +74,20 @@ const small = "rounded-full px-3 py-1 text-xs font-medium";
 
 function Messages() {
   const qc = useQueryClient();
+  const change = useServerFn(changeAdminData);
   const q = useQuery({
     queryKey: ["admin-messages"],
-    queryFn: async () => (await supabase.from("contact_submissions").select("*").order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => (await getAdminData()).messages,
   });
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin-messages"] });
   async function setStatus(id: string, status: string) {
-    const { error } = await supabase.from("contact_submissions").update({ status }).eq("id", id);
-    if (error) toast.error("Couldn't update"); else refresh();
+    try { await change({ data: { table: "contact_submissions", action: "save", id, row: { status: status as "new" | "replied" | "closed" } } }); refresh(); }
+    catch { toast.error("Couldn't update"); }
   }
   async function remove(id: string) {
     if (!confirm("Delete this message?")) return;
-    const { error } = await supabase.from("contact_submissions").delete().eq("id", id);
-    if (error) toast.error("Couldn't delete"); else { toast.success("Deleted"); refresh(); }
+    try { await change({ data: { table: "contact_submissions", action: "delete", id } }); toast.success("Deleted"); refresh(); }
+    catch { toast.error("Couldn't delete"); }
   }
   if (q.isLoading) return <p className="text-muted-foreground">Loading…</p>;
   if (!q.data?.length) return <p className="text-muted-foreground">No messages yet.</p>;
@@ -126,10 +115,10 @@ function Messages() {
           <p className="mt-3 whitespace-pre-wrap text-foreground">{m.message}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {["new", "replied", "closed"].map((s) => (
-              <button key={s} onClick={() => setStatus(m.id, s)} className={`${small} capitalize ${m.status === s ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}`}>{s}</button>
+              <Button variant="ghost" key={s} onClick={() => setStatus(m.id, s)} className={`${small} capitalize ${m.status === s ? "bg-accent text-accent-foreground" : "bg-secondary text-secondary-foreground"}`}>{s}</Button>
             ))}
             <a href={`mailto:${m.email}?subject=Re: your PracticeMD enquiry`} className={`${small} bg-primary text-primary-foreground`}>Reply by email</a>
-            <button onClick={() => remove(m.id)} className={`${small} text-destructive hover:bg-secondary`}>Delete</button>
+            <Button variant="ghost" onClick={() => remove(m.id)} className={`${small} text-destructive hover:bg-secondary`}>Delete</Button>
           </div>
         </div>
       ))}
@@ -140,20 +129,24 @@ function Messages() {
 function Testimonials() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<string | null>(null);
-  const q = useQuery({ queryKey: ["admin-testimonials"], queryFn: async () => (await supabase.from("testimonials").select("*").order("sort_order")).data ?? [] });
+  const change = useServerFn(changeAdminData);
+  const q = useQuery({ queryKey: ["admin-testimonials"], queryFn: async () => (await getAdminData()).testimonials });
   const refresh = () => { qc.invalidateQueries({ queryKey: ["admin-testimonials"] }); setEditing(null); };
   async function save(e: FormEvent<HTMLFormElement>, id?: string) {
     e.preventDefault();
     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
     const row = { quote: f["quote"] ?? "", author: f["author"] ?? "", role: f["role"] ?? "", sort_order: Number(f["sort_order"] ?? 0) };
-    if (!row.quote.trim() || !row.author.trim()) return toast.error("Quote and name are required");
-    const { error } = id ? await supabase.from("testimonials").update(row).eq("id", id) : await supabase.from("testimonials").insert(row);
-    if (error) return toast.error("Couldn't save");
-    toast.success("Saved"); if (!id) e.currentTarget.reset(); refresh(); return undefined;
+    if (!row.quote.trim() || !row.author.trim()) { toast.error("Quote and name are required"); return; }
+    const formElement = e.currentTarget;
+    try {
+      await change({ data: { table: "testimonials", action: "save", id, row } });
+      toast.success("Saved"); if (!id) formElement.reset(); refresh();
+    } catch { toast.error("Couldn't save"); }
   }
   async function remove(id: string) {
     if (!confirm("Delete this testimonial?")) return;
-    await supabase.from("testimonials").delete().eq("id", id); refresh();
+    try { await change({ data: { table: "testimonials", action: "delete", id } }); refresh(); }
+    catch { toast.error("Couldn't delete"); }
   }
   const form = (t?: { id: string; quote: string; author: string; role: string; sort_order: number }) => (
     <form onSubmit={(e) => save(e, t?.id)} className="space-y-2">
@@ -164,8 +157,8 @@ function Testimonials() {
         <input name="sort_order" type="number" defaultValue={t?.sort_order ?? 0} className={field} aria-label="Order" />
       </div>
       <div className="flex gap-2">
-        <button className={`${small} bg-primary text-primary-foreground`}>{t ? "Save" : "Add testimonial"}</button>
-        {t && <button type="button" onClick={() => setEditing(null)} className={`${small} bg-secondary`}>Cancel</button>}
+        <Button variant="ghost" className={`${small} bg-primary text-primary-foreground`}>{t ? "Save" : "Add testimonial"}</Button>
+        {t && <Button variant="ghost" type="button" onClick={() => setEditing(null)} className={`${small} bg-secondary`}>Cancel</Button>}
       </div>
     </form>
   );
@@ -179,8 +172,8 @@ function Testimonials() {
               <p className="text-foreground">"{t.quote}"</p>
               <p className="mt-2 text-sm text-muted-foreground">{t.author}{t.role && ` · ${t.role}`}</p>
               <div className="mt-3 flex gap-2">
-                <button onClick={() => setEditing(t.id)} className={`${small} bg-secondary`}>Edit</button>
-                <button onClick={() => remove(t.id)} className={`${small} text-destructive`}>Delete</button>
+                <Button variant="ghost" onClick={() => setEditing(t.id)} className={`${small} bg-secondary`}>Edit</Button>
+                <Button variant="ghost" onClick={() => remove(t.id)} className={`${small} text-destructive`}>Delete</Button>
               </div>
             </>
           )}
@@ -193,20 +186,24 @@ function Testimonials() {
 function Faqs() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<string | null>(null);
-  const q = useQuery({ queryKey: ["admin-faqs"], queryFn: async () => (await supabase.from("faqs").select("*").order("sort_order")).data ?? [] });
+  const change = useServerFn(changeAdminData);
+  const q = useQuery({ queryKey: ["admin-faqs"], queryFn: async () => (await getAdminData()).faqs });
   const refresh = () => { qc.invalidateQueries({ queryKey: ["admin-faqs"] }); setEditing(null); };
   async function save(e: FormEvent<HTMLFormElement>, id?: string) {
     e.preventDefault();
     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
     const row = { question: f["question"] ?? "", answer: f["answer"] ?? "", sort_order: Number(f["sort_order"] ?? 0) };
-    if (!row.question.trim() || !row.answer.trim()) return toast.error("Question and answer are required");
-    const { error } = id ? await supabase.from("faqs").update(row).eq("id", id) : await supabase.from("faqs").insert(row);
-    if (error) return toast.error("Couldn't save");
-    toast.success("Saved"); if (!id) e.currentTarget.reset(); refresh(); return undefined;
+    if (!row.question.trim() || !row.answer.trim()) { toast.error("Question and answer are required"); return; }
+    const formElement = e.currentTarget;
+    try {
+      await change({ data: { table: "faqs", action: "save", id, row } });
+      toast.success("Saved"); if (!id) formElement.reset(); refresh();
+    } catch { toast.error("Couldn't save"); }
   }
   async function remove(id: string) {
     if (!confirm("Delete this question?")) return;
-    await supabase.from("faqs").delete().eq("id", id); refresh();
+    try { await change({ data: { table: "faqs", action: "delete", id } }); refresh(); }
+    catch { toast.error("Couldn't delete"); }
   }
   const form = (x?: { id: string; question: string; answer: string; sort_order: number }) => (
     <form onSubmit={(e) => save(e, x?.id)} className="space-y-2">
@@ -216,8 +213,8 @@ function Faqs() {
       </div>
       <textarea name="answer" defaultValue={x?.answer} rows={3} placeholder="Answer" className={field} />
       <div className="flex gap-2">
-        <button className={`${small} bg-primary text-primary-foreground`}>{x ? "Save" : "Add question"}</button>
-        {x && <button type="button" onClick={() => setEditing(null)} className={`${small} bg-secondary`}>Cancel</button>}
+        <Button variant="ghost" className={`${small} bg-primary text-primary-foreground`}>{x ? "Save" : "Add question"}</Button>
+        {x && <Button variant="ghost" type="button" onClick={() => setEditing(null)} className={`${small} bg-secondary`}>Cancel</Button>}
       </div>
     </form>
   );
@@ -231,8 +228,8 @@ function Faqs() {
               <p className="font-semibold text-primary">{x.question}</p>
               <p className="mt-1 text-muted-foreground">{x.answer}</p>
               <div className="mt-3 flex gap-2">
-                <button onClick={() => setEditing(x.id)} className={`${small} bg-secondary`}>Edit</button>
-                <button onClick={() => remove(x.id)} className={`${small} text-destructive`}>Delete</button>
+                <Button variant="ghost" onClick={() => setEditing(x.id)} className={`${small} bg-secondary`}>Edit</Button>
+                <Button variant="ghost" onClick={() => remove(x.id)} className={`${small} text-destructive`}>Delete</Button>
               </div>
             </>
           )}
@@ -245,19 +242,19 @@ function Faqs() {
 function Chats() {
   const qc = useQueryClient();
   const [openId, setOpenId] = useState<string | null>(null);
+  const change = useServerFn(changeAdminData);
   const q = useQuery({
     queryKey: ["admin-chats"],
-    queryFn: async () => (await supabase.from("chat_conversations").select("id, live_agent_requested, created_at, updated_at, chat_messages(count)").order("updated_at", { ascending: false })).data ?? [],
+    queryFn: async () => (await getAdminData()).chats,
   });
-  const msgs = useQuery({
-    queryKey: ["admin-chat", openId],
-    enabled: !!openId,
-    queryFn: async () => (await supabase.from("chat_messages").select("id, role, content, created_at").eq("conversation_id", openId!).order("created_at")).data ?? [],
-  });
+  const msgs = q.data?.find((chat) => chat.id === openId)?.chat_messages ?? [];
   async function remove(id: string) {
     if (!confirm("Delete this conversation?")) return;
-    const { error } = await supabase.from("chat_conversations").delete().eq("id", id);
-    if (error) toast.error("Couldn't delete"); else { toast.success("Deleted"); if (openId === id) setOpenId(null); qc.invalidateQueries({ queryKey: ["admin-chats"] }); }
+    try {
+      await change({ data: { table: "chat_conversations", action: "delete", id } });
+      toast.success("Deleted"); if (openId === id) setOpenId(null);
+      qc.invalidateQueries({ queryKey: ["admin-chats"] });
+    } catch { toast.error("Couldn't delete"); }
   }
   if (q.isLoading) return <p className="text-muted-foreground">Loading…</p>;
   if (!q.data?.length) return <div className={card}><p className="text-muted-foreground">No chatbot conversations yet.</p></div>;
@@ -269,17 +266,17 @@ function Chats() {
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="text-sm">
               <span className="font-medium">{new Date(c.updated_at).toLocaleString("en-GB")}</span>
-              <span className="ml-2 text-muted-foreground">{(c.chat_messages as unknown as { count: number }[])?.[0]?.count ?? 0} messages</span>
+              <span className="ml-2 text-muted-foreground">{c.chat_messages.length} messages</span>
               {c.live_agent_requested && <span className={`${small} ml-2 bg-accent text-accent-foreground`}>Wants contact</span>}
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setOpenId(openId === c.id ? null : c.id)} className={`${small} border border-input`}>{openId === c.id ? "Hide" : "View"}</button>
-              <button onClick={() => remove(c.id)} className={`${small} border border-input text-destructive`}>Delete</button>
+              <Button variant="ghost" onClick={() => setOpenId(openId === c.id ? null : c.id)} className={`${small} border border-input`}>{openId === c.id ? "Hide" : "View"}</Button>
+              <Button variant="ghost" onClick={() => remove(c.id)} className={`${small} border border-input text-destructive`}>Delete</Button>
             </div>
           </div>
           {openId === c.id && (
             <div className="mt-4 space-y-2 border-t border-border pt-4 text-sm">
-              {msgs.data?.map((m) => (
+              {[...msgs].sort((a, b) => a.created_at.localeCompare(b.created_at)).map((m) => (
                 <p key={m.id} className="whitespace-pre-wrap"><span className={`font-medium ${m.role === "user" ? "text-primary" : "text-muted-foreground"}`}>{m.role === "user" ? "Visitor" : "NEXA"}:</span> {m.content}</p>
               ))}
             </div>
