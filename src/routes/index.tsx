@@ -72,7 +72,7 @@ function Index() {
             <Eyebrow>Made for UK primary care</Eyebrow>
             <h1 className="font-display text-4xl leading-tight text-primary md:text-5xl lg:text-6xl">PracticeMD<span className="mt-3 block text-3xl leading-tight md:text-4xl lg:text-5xl">Practice dashboards.<br /><em>Your</em> way.</span></h1>
             <p className="mt-5 max-w-lg text-lg text-foreground">Custom practice management dashboards, tailored to the way your GP practice works.</p>
-            <p className="mt-3 max-w-lg text-muted-foreground">Bring appointments, staffing, targets and income into a clearer view — built around the numbers that matter to your team.</p>
+            <p className="mt-3 hidden max-w-lg text-muted-foreground sm:block">Bring appointments, staffing, targets and income into a clearer view — built around the numbers that matter to your team.</p>
             <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
               <Button asChild variant="brand" className="h-12 px-6"><Link to="/contact">Let’s talk about your practice <ArrowRight /></Link></Button>
               <Button asChild variant="pill" className="h-12 px-6"><Link to="/demos">Explore the demos</Link></Button>
