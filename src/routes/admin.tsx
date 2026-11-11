@@ -136,7 +136,7 @@ function Testimonials() {
     e.preventDefault();
     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
     const row = { quote: f["quote"] ?? "", author: f["author"] ?? "", role: f["role"] ?? "", sort_order: Number(f["sort_order"] ?? 0) };
-    if (!row.quote.trim() || !row.author.trim()) return toast.error("Quote and name are required");
+    if (!row.quote.trim() || !row.author.trim()) { toast.error("Quote and name are required"); return; }
     const formElement = e.currentTarget;
     try {
       await change({ data: { table: "testimonials", action: "save", id, row } });
@@ -193,7 +193,7 @@ function Faqs() {
     e.preventDefault();
     const f = Object.fromEntries(new FormData(e.currentTarget)) as Record<string, string>;
     const row = { question: f["question"] ?? "", answer: f["answer"] ?? "", sort_order: Number(f["sort_order"] ?? 0) };
-    if (!row.question.trim() || !row.answer.trim()) return toast.error("Question and answer are required");
+    if (!row.question.trim() || !row.answer.trim()) { toast.error("Question and answer are required"); return; }
     const formElement = e.currentTarget;
     try {
       await change({ data: { table: "faqs", action: "save", id, row } });
