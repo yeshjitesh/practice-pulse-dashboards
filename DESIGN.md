@@ -34,3 +34,5 @@ Never recolour the logo (`src/components/brand/Logo.tsx`).
 - Container max-w-7xl (2xl: 90rem), px-6 (lg: px-10); sections py-20 to py-28.
 - Phones: buttons stack full width; strips become 2×2 grids; decorative drawings may hide.
 - Motion: gentle fade-up on scroll only, disabled for reduced motion.
+- Homepage: illustrated introduction, selected demos, three priority areas, benefits, process, FAQs, then contact. Keep the full catalogue on Features rather than repeating it on the homepage.
+- Phone header keeps the wordmark visible and provides an expandable navigation menu; homepage actions stack with comfortable touch targets.

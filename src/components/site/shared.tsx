@@ -1,5 +1,7 @@
 import { ChatWidget } from "@/components/chat/ChatWidget";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Menu, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
 import { CookieBanner, openCookieSettings } from "@/components/site/CookieBanner";
@@ -31,20 +33,29 @@ const navLink = "text-muted-foreground transition-colors hover:text-primary";
 const navActive = { className: "text-primary font-medium" };
 
 export function SiteShell({ children }: { children: ReactNode }) {
+  const [menuOpen, setMenuOpen] = useState(false);
   useReveal();
   return (
     <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-7xl 2xl:max-w-[90rem] items-center justify-between px-6 lg:px-10 py-4">
-          <Link to="/" aria-label="PracticeMD home"><Logo subtitle iconOnlyOnMobile /></Link>
-          <nav className="flex items-center gap-6 text-sm">
+          <Link to="/" aria-label="PracticeMD home"><Logo subtitle /></Link>
+          <nav aria-label="Main navigation" className="flex items-center gap-3 md:gap-6 text-sm">
             <Link to="/features" className={`hidden md:inline ${navLink}`} activeProps={navActive}>Features</Link>
             <Link to="/demos" className={`hidden md:inline ${navLink}`} activeProps={navActive}>Demos</Link>
             <Link to="/how-it-works" className={`hidden md:inline ${navLink}`} activeProps={navActive}>How it works</Link>
             <Link to="/faq" className={`hidden md:inline ${navLink}`} activeProps={navActive}>FAQ</Link>
-            <Link to="/contact" className={`${btn} px-5 py-2`}>Get in touch</Link>
+            <Button asChild variant="brand" className="hidden sm:inline-flex"><Link to="/contact">Get in touch</Link></Button>
+            <Button variant="ghost" size="icon" className="md:hidden text-primary" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</Button>
           </nav>
         </div>
+        {menuOpen && <nav id="mobile-navigation" aria-label="Mobile navigation" className="grid gap-1 border-t border-border bg-background px-6 py-4 md:hidden">
+          <Link to="/features" onClick={() => setMenuOpen(false)} className="py-3 text-primary">Features</Link>
+          <Link to="/demos" onClick={() => setMenuOpen(false)} className="py-3 text-primary">Demos</Link>
+          <Link to="/how-it-works" onClick={() => setMenuOpen(false)} className="py-3 text-primary">How it works</Link>
+          <Link to="/faq" onClick={() => setMenuOpen(false)} className="py-3 text-primary">FAQ</Link>
+          <Button asChild variant="brand" className="mt-2"><Link to="/contact" onClick={() => setMenuOpen(false)}>Get in touch</Link></Button>
+        </nav>}
       </header>
       <main>{children}</main>
       <ChatWidget />

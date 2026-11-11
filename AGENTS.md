@@ -13,3 +13,4 @@
 - Sitemap is router-derived (src/lib/sitemap.ts + src/routes/sitemap[.]xml.ts); every route must set staticData.sitemap — keeps search listings in sync with pages.
 - src/design/ holds the uploaded style reference (tokens.json, variables.css, theme_1.css, style-reference.md) as source material only; live tokens are in src/styles.css and DESIGN.md — keeps one source of truth for the running site.
 - Public marketing pages share SiteShell (header/footer), pageHead() and breadcrumb() from src/components/site/shared.tsx and reusable sections from sections.tsx — each section page is its own route so it gets its own SEO head and sitemap entry.
+- The homepage uses a concise overview and selected demos rather than repeating the full feature catalogue; detailed coverage stays on the dedicated pages to keep the enquiry journey focused.
