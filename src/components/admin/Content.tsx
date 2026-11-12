@@ -160,7 +160,7 @@ export function Chats() {
                   <div className="min-w-0">
                     <p className="flex flex-wrap items-center gap-2 text-sm">
                       <span className="font-medium">{formatDate(c.updated_at)}</span>
-                      <span className="text-muted-foreground">{c.chat_messages.length} messages</span>
+                      <span className="text-muted-foreground">{c.chat_messages.length} {c.chat_messages.length === 1 ? "message" : "messages"}</span>
                       {c.live_agent_requested && <span className="rounded-full bg-peach px-2.5 py-0.5 text-xs font-medium">Wants contact</span>}
                     </p>
                     {first && <p className="mt-1 line-clamp-1 text-sm text-muted-foreground">“{first.content}”</p>}

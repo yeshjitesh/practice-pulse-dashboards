@@ -14,3 +14,4 @@
 - src/design/ holds the uploaded style reference (tokens.json, variables.css, theme_1.css, style-reference.md) as source material only; live tokens are in src/styles.css and DESIGN.md — keeps one source of truth for the running site.
 - Public marketing pages share SiteShell (header/footer), pageHead() and breadcrumb() from src/components/site/shared.tsx and reusable sections from sections.tsx — each section page is its own route so it gets its own SEO head and sitemap entry.
 - The homepage uses a concise overview and selected demos rather than repeating the full feature catalogue; detailed coverage stays on the dedicated pages to keep the enquiry journey focused.
+- Admin dashboard sections live in src/components/admin/ and share one cached admin-data query; enquiry filtering, counts and CSV export are pure helpers in src/lib/admin-insights.ts — keeps the route thin and the rules testable.
