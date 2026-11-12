@@ -57,7 +57,7 @@ function Admin() {
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur">
         <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6 lg:px-10">
           <div className="flex min-w-0 items-center gap-3">
-            <Link to="/" className="shrink-0"><Logo iconOnlyOnMobile /></Link>
+            <Link to="/" className="shrink-0"><Logo /></Link>
             <span className="truncate rounded-full bg-secondary px-2.5 py-0.5 font-mono text-xs uppercase tracking-[0.06em] text-muted-foreground">Admin</span>
           </div>
           <div className="flex shrink-0 items-center gap-2">
@@ -66,7 +66,7 @@ function Admin() {
           </div>
         </div>
         <nav aria-label="Admin sections" className="border-t border-border lg:hidden">
-          <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-2 sm:px-6">
+          <div className="mx-auto flex max-w-7xl flex-wrap gap-1 px-4 py-2 sm:px-6">
             {nav.map((n) => <NavButton key={n.id} item={n} active={tab === n.id} onClick={() => go(n.id)} compact />)}
           </div>
         </nav>

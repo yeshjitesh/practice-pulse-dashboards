@@ -12,7 +12,7 @@ export function Overview({ go }: { go: (tab: AdminTab) => void }) {
   const tiles = [
     { label: "New enquiries", value: stats.new, hint: "Waiting for a reply", icon: Inbox, tone: "bg-peach", tab: "enquiries" as const },
     { label: "Last 7 days", value: stats.lastWeek, hint: `${stats.total} enquiries in total`, icon: Clock, tone: "bg-sky", tab: "enquiries" as const },
-    { label: "Chats wanting contact", value: wantsContact, hint: `${data?.chats.length ?? 0} conversations`, icon: MessageCircle, tone: "bg-sage", tab: "chats" as const },
+    { label: "Chats wanting contact", value: wantsContact, hint: `${data?.chats.length ?? 0} ${data?.chats.length === 1 ? "conversation" : "conversations"}`, icon: MessageCircle, tone: "bg-sage", tab: "chats" as const },
     { label: "FAQs live", value: data?.faqs.length ?? 0, hint: "On the FAQ page", icon: HelpCircle, tone: "bg-blush", tab: "faqs" as const },
   ];
   const latest = (data?.messages ?? []).slice(0, 5);

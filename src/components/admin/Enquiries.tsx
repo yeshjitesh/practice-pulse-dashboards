@@ -149,7 +149,7 @@ function EnquiryDialog({ value, onClose }: { value: Enquiry | "new" | null; onCl
   );
   return (
     <Dialog open={value !== null} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-xl">
+      <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-xl bg-card">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl text-primary">{e ? "Edit enquiry" : "Add an enquiry"}</DialogTitle>
           <DialogDescription>{e ? "Correct details or update the status." : "Log an enquiry you received by phone or email."}</DialogDescription>
