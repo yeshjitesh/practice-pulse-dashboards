@@ -35,8 +35,8 @@ function Admin() {
   const navigate = useNavigate();
   const lock = useServerFn(lockAdmin);
   const [tab, setTab] = useState<AdminTab>("overview");
-  const newCount = data.messages.filter((m) => m.status === "new").length;
-  const contactChats = data.chats.filter((c) => c.live_agent_requested).length;
+  const newCount = (data?.messages ?? []).filter((m) => m.status === "new").length;
+  const contactChats = (data?.chats ?? []).filter((c) => c.live_agent_requested).length;
   const nav: { id: AdminTab; label: string; icon: typeof Inbox; badge?: number }[] = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "enquiries", label: "Enquiries", icon: Inbox, badge: newCount },
