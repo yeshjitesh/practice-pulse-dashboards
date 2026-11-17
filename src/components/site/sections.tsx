@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { btn, Eyebrow } from "@/components/site/shared";
+import { Button } from "@/components/ui/button";
+import { Eyebrow } from "@/components/site/shared";
 import contactDrawing from "@/assets/contact-drawing.jpg";
 import stepChat from "@/assets/step-chat-drawing.jpg";
 import stepBuild from "@/assets/step-build-drawing.jpg";
@@ -60,9 +61,9 @@ const benefits = [
 ];
 
 const steps = [
-  { n: "01", t: "Talk to us", d: "Tell us how your practice works and which numbers matter most." },
-  { n: "02", t: "We design it", d: "We sketch your dashboard and refine it with your team until it feels right." },
-  { n: "03", t: "Go live", d: "Your dashboard goes live, and we keep improving it as your needs change." },
+  { n: "01", t: "Tell us about your reports", d: "Which spreadsheet takes the most time? Start with a conversation about your team and the questions you need answered — no patient records needed." },
+  { n: "02", t: "Make a plan together", d: "We review the report format, sketch your dashboard and agree a secure way to import the right data. Your team shapes it with us." },
+  { n: "03", t: "Bring your numbers to life", d: "Your practice provides the agreed reports. We help you use your dashboard and plan how to refresh it, with support as your needs change." },
 ];
 
 const useCases = [
@@ -105,7 +106,7 @@ export function FeaturesSection({ as: Tag = "h2" }: { as?: H }) {
           <div data-reveal className="reveal"><Eyebrow>Features</Eyebrow></div>
           <Tag data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">Everything a UK practice runs on</Tag>
           <p data-reveal className="reveal mt-4 max-w-2xl text-lg text-muted-foreground">
-            Example dashboards we build for GP surgeries, PCNs and primary care teams. Pick what you need, and we shape it to your practice.
+            A starting point, not a one-size-fits-all package. Choose the numbers that matter to your team; we build around the reports and files you provide, without connecting to live NHS systems.
           </p>
             </div>
             <img data-reveal src={featuresDrawing} alt="Drawing of a laptop on a GP practice desk surrounded by dashboard cards: charts, a calendar, a staff rota and finances" width={1024} height={768} loading="lazy" className="reveal w-full rounded-xl border border-border" />
@@ -136,7 +137,8 @@ export function HowSection({ as: Tag = "h2" }: { as?: H }) {
       <section id="how" className="scroll-mt-24 bg-blush">
         <div className="mx-auto max-w-7xl 2xl:max-w-[90rem] px-6 lg:px-10 py-24">
         <div data-reveal className="reveal"><Eyebrow dot="bg-rose">The process</Eyebrow></div>
-        <Tag data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">How it works</Tag>
+        <Tag data-reveal className="reveal font-display text-4xl text-primary md:text-5xl">From your reports to a clearer view</Tag>
+        <p className="mt-4 max-w-2xl text-lg text-muted-foreground">A friendly conversation, a plan that fits, and support along the way. No live clinical-system connection required.</p>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {steps.map((s, i) => (
             <div key={s.n} data-reveal className="reveal relative overflow-hidden rounded-xl border border-border bg-card" style={{ transitionDelay: `${i * 100}ms` }}>
@@ -166,10 +168,10 @@ export function FaqSection({ faqs, as: Tag = "h2" }: { faqs: Faq[]; as?: H }) {
           <div className="mt-10 divide-y divide-border rounded-xl border border-border bg-card">
             {faqs.map((f) => (
               <div key={f.id}>
-                <button onClick={() => setOpen(open === f.id ? null : f.id)} className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-semibold text-primary" aria-expanded={open === f.id}>
+                <Button variant="ghost" onClick={() => setOpen(open === f.id ? null : f.id)} className="flex h-auto w-full items-center justify-between gap-4 whitespace-normal rounded-none px-6 py-5 text-left font-semibold text-primary hover:bg-secondary" aria-expanded={open === f.id}>
                   {f.question}
                   <span className={`text-2xl text-accent transition-transform ${open === f.id ? "rotate-45" : ""}`}>+</span>
-                </button>
+                </Button>
                 <div className={`grid transition-all duration-300 ${open === f.id ? "grid-rows-[1fr] pb-5" : "grid-rows-[0fr]"}`}>
                   <p className="overflow-hidden px-6 text-muted-foreground">{f.answer}</p>
                 </div>
@@ -237,8 +239,9 @@ export function ContactSection({ as: Tag = "h2" }: { as?: H }) {
         <div className="mx-auto grid max-w-7xl 2xl:max-w-[90rem] gap-12 px-6 lg:px-10 py-24 md:grid-cols-2">
           <div data-reveal className="reveal">
             <Eyebrow>Contact</Eyebrow>
-            <Tag className="font-display text-4xl text-primary md:text-5xl">Let's talk about your practice</Tag>
-            <p className="mt-4 text-lg text-muted-foreground">Share a few details and we'll get back to you to discuss what your dashboard could look like.</p>
+            <Tag className="font-display text-4xl text-primary md:text-5xl">Let’s look at your reports together</Tag>
+            <p className="mt-4 text-lg text-muted-foreground">Tell us which routine search gives you the biggest headache. We can start with a low-pressure 15-minute chat about how a visual dashboard could help.</p>
+            <p className="mt-4 text-sm text-muted-foreground">Just your name, email and a little about your needs are required. Everything else is optional. Please don’t include patient information or attach clinical reports.</p>
             <img src={contactDrawing} alt="Drawing of a friendly GP receptionist waving next to a calendar and checklist" width={1024} height={1024} loading="lazy" className="mt-10 hidden w-full max-w-sm rounded-xl border border-border md:block" />
           </div>
           {status === "done" ? (
@@ -283,13 +286,13 @@ export function ContactSection({ as: Tag = "h2" }: { as?: H }) {
                   <label className={lbl}>When would you like to start?<Select name="timeline" options={timelines} /></label>
                   <label className={lbl}>Best way to reach you<Select name="contact_preference" options={contactPrefs} /></label>
                   <label className={`${lbl} sm:col-span-2`}>How did you hear about us?<Select name="heard_about" options={heardOptions} /></label>
-                  <label className={`${lbl} sm:col-span-2`}>Tell us about your needs *<textarea name="message" rows={5} placeholder="What challenges are you facing, and what would you like your dashboard to do?" maxLength={2000} className={input} /></label>
+                  <label className={`${lbl} sm:col-span-2`}>Tell us about your needs *<textarea name="message" rows={5} placeholder="Which report takes up your time? What would you like to see more clearly?" maxLength={2000} className={input} /></label>
                 </div>
               </fieldset>
               {error && <p className="text-sm text-destructive">{error}</p>}
-              <button disabled={status === "sending"} className={`${btn} w-full px-8 py-4 disabled:opacity-60`}>
-                {status === "sending" ? "Sending…" : "Send message"}
-              </button>
+              <Button variant="brand" type="submit" disabled={status === "sending"} className="h-12 w-full px-8">
+                {status === "sending" ? "Sending…" : "Let’s start a conversation"}
+              </Button>
             </form>
           )}
         </div>

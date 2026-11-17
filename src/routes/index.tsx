@@ -4,6 +4,8 @@ import { ArrowRight, CalendarDays, ChartNoAxesCombined, Users, Check, SlidersHor
 import { Button } from "@/components/ui/button";
 import { contentQuery } from "@/lib/content-query";
 import { Eyebrow, SiteShell } from "@/components/site/shared";
+import { ImportSteps } from "@/components/site/ImportSteps";
+import { withImportFaqs } from "@/lib/import-faqs";
 import { DemoPreview } from "@/components/site/DemoPreview";
 import { HowSection, FaqSection, ContactSection } from "@/components/site/sections";
 import homeDrawing from "@/assets/practice-home-drawing.jpg";
@@ -15,16 +17,16 @@ export const Route = createFileRoute("/")({
     return {
     meta: [
       { title: "PracticeMD — Practice management dashboards built for your practice" },
-      { name: "description", content: "PracticeMD builds bespoke practice management dashboards tailored to how your GP practice actually works." },
+      { name: "description", content: "Turn practice-supplied CSV reports and spreadsheets into bespoke GP practice dashboards. No live NHS connection. Explore sample demos and talk to PracticeMD." },
       { name: "robots", content: "index, follow, max-image-preview:large" },
       { property: "og:title", content: "PracticeMD — Bespoke practice dashboards" },
-      { property: "og:description", content: "Custom practice management dashboards, built around your practice's needs." },
+      { property: "og:description", content: "Clear GP practice dashboards built around your imported reports, not live NHS connections." },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "en_GB" },
       { property: "og:url", content: "https://practicemd.uk/" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "PracticeMD — Bespoke practice dashboards" },
-      { name: "twitter:description", content: "Custom practice management dashboards, built around your practice's needs." },
+      { name: "twitter:description", content: "Clear GP practice dashboards built around your imported reports, not live NHS connections." },
     ],
     links: [{ rel: "canonical", href: "https://practicemd.uk/" }],
     scripts: [
@@ -70,9 +72,9 @@ function Index() {
         <div className="relative mx-auto max-w-7xl px-6 pb-10 pt-10 lg:px-10 md:py-16 2xl:max-w-[90rem]">
           <div className="max-w-xl animate-fade-up md:max-w-[48%]">
             <Eyebrow>Made for UK primary care</Eyebrow>
-            <h1 className="font-display text-4xl leading-tight text-primary md:text-5xl lg:text-6xl">PracticeMD<span className="mt-3 block text-3xl leading-tight md:text-4xl lg:text-5xl">Practice dashboards.<br /><em>Your</em> way.</span></h1>
-            <p className="mt-5 max-w-lg text-lg text-foreground">Custom practice management dashboards, tailored to the way your GP practice works.</p>
-            <p className="mt-3 hidden max-w-lg text-muted-foreground sm:block">Bring appointments, staffing, targets and income into a clearer view — built around the numbers that matter to your team.</p>
+            <h1 className="font-display text-4xl leading-tight text-primary md:text-5xl lg:text-6xl">PracticeMD<span className="mt-3 block text-3xl leading-tight md:text-4xl lg:text-5xl">Your reports.<br /><em>A clearer</em> picture.</span></h1>
+            <p className="mt-5 max-w-lg text-lg text-foreground">Your practice reports, turned into clear dashboards. No live NHS connection — built around the files you choose to provide.</p>
+            <p className="mt-3 hidden max-w-lg text-muted-foreground sm:block">Less time wrestling spreadsheets before partner meetings. More time understanding appointments, staffing, targets and income.</p>
             <div className="mt-7 grid gap-3 sm:flex sm:flex-wrap">
               <Button asChild variant="brand" className="h-12 px-6"><Link to="/contact">Let’s talk about your practice <ArrowRight /></Link></Button>
               <Button asChild variant="pill" className="h-12 px-6"><Link to="/demos">Explore the demos</Link></Button>
@@ -84,10 +86,11 @@ function Index() {
 
       <section className="border-b border-border bg-blush">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-6 py-5 text-sm text-primary lg:px-10 md:grid-cols-4 2xl:max-w-[90rem]">
-          {["UK primary care", "15 dashboard demos", "Built around your team", "Ongoing support"].map((text) => <p key={text} className="flex items-center gap-2"><Check className="h-4 w-4 shrink-0" />{text}</p>)}
+          {["UK primary care", "Your reports, your choice", "No live NHS connection", "Support from real people"].map((text) => <p key={text} className="flex items-center gap-2"><Check className="h-4 w-4 shrink-0" />{text}</p>)}
         </div>
       </section>
 
+      <ImportSteps />
       <DemoPreview />
 
       <section className="border-y border-border bg-secondary">
@@ -125,7 +128,7 @@ function Index() {
         </div>
       </section>
       <HowSection />
-      <FaqSection faqs={data.faqs} />
+      <FaqSection faqs={withImportFaqs(data.faqs)} />
       <ContactSection />
     </SiteShell>
   );

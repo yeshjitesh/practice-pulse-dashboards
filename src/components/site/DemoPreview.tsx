@@ -1,5 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { SampleImport } from "@/components/site/SampleImport";
+import type { Demo } from "@/lib/demo-data";
 import { demos } from "@/lib/demo-data";
 import { Eyebrow } from "@/components/site/shared";
 import { Button } from "@/components/ui/button";
@@ -10,7 +12,8 @@ const featured = ["appointments", "qof", "finance", "cqc"];
 export function DemoPreview() {
   const list = demos.filter((d) => featured.includes(d.id));
   const [id, setId] = useState("appointments");
-  const d = list.find((x) => x.id === id) ?? list[0];
+  const [imported, setImported] = useState<Demo | null>(null);
+  const d = imported?.id === id ? imported : list.find((x) => x.id === id) ?? list[0];
   if (!d) return null;
   const max = Math.max(...d.bars.map(([, v]) => v));
   return (
@@ -22,7 +25,7 @@ export function DemoPreview() {
           <p className="mt-4 text-lg text-muted-foreground">A clearer view of your appointments, targets and income. Start with a sample, then imagine it shaped around your practice.</p>
           <div role="group" aria-label="Featured demos" className="mt-8 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
             {list.map((x) => (
-              <Button key={x.id} variant={x.id === id ? "brand" : "pill"} aria-pressed={x.id === id} aria-controls="featured-dashboard" onClick={() => { if (x.id === id) return; setId(x.id); window.__lovableEvents?.track?.("project.demo_opened", { demo: x.id, location: "home" }); }} className="h-auto min-h-11 whitespace-normal px-4 py-2 text-sm">
+              <Button key={x.id} variant={x.id === id ? "brand" : "pill"} aria-pressed={x.id === id} aria-controls="featured-dashboard" onClick={() => { if (x.id === id) return; setId(x.id); setImported(null); window.__lovableEvents?.track?.("project.demo_opened", { demo: x.id, location: "home" }); }} className="h-auto min-h-11 whitespace-normal px-4 py-2 text-sm">
                 {({ appointments: "Appointments", qof: "QOF", finance: "Finance", cqc: "CQC" } as Record<string, string>)[x.id] ?? x.name}
               </Button>
             ))}
@@ -40,6 +43,7 @@ export function DemoPreview() {
             </div>
             <span className="shrink-0 rounded-full bg-background px-3 py-1 font-mono text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">Sample</span>
           </div>
+          <SampleImport onImported={(sample) => { setId(sample.id); setImported(sample); }} />
           <div className="mt-5 grid grid-cols-2 gap-3">
             {d.kpis.map(([l, v, s, c]) => (
               <div key={l} className={`rounded-xl p-4 ${c}`}>

@@ -4,7 +4,7 @@ import { FeaturesSection } from "@/components/site/sections";
 
 export const Route = createFileRoute("/features")({
   staticData: { sitemap: true },
-  head: () => ({ ...pageHead("/features", 'Features — Practice dashboards for UK GP practices | PracticeMD', '15 example dashboards for UK GP practices and PCNs: QOF, Enhanced Services, CQC readiness, rotas, appointments, prescribing, finance and more.'), scripts: [breadcrumb("/features", "Features")] }),
+  head: () => ({ ...pageHead("/features", 'Features — Practice dashboards for UK GP practices | PracticeMD', 'Explore bespoke GP practice dashboards built around your supplied reports: QOF, appointments, staffing and finance. No live NHS connection.'), scripts: [breadcrumb("/features", "Features")] }),
   component: FeaturesPage,
 });
 

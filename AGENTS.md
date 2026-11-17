@@ -15,3 +15,6 @@
 - Public marketing pages share SiteShell (header/footer), pageHead() and breadcrumb() from src/components/site/shared.tsx and reusable sections from sections.tsx — each section page is its own route so it gets its own SEO head and sitemap entry.
 - The homepage uses a concise overview and selected demos rather than repeating the full feature catalogue; detailed coverage stays on the dedicated pages to keep the enquiry journey focused.
 - Admin dashboard sections live in src/components/admin/ and share one cached admin-data query; enquiry filtering, counts and CSV export are pure helpers in src/lib/admin-insights.ts — keeps the route thin and the rules testable.
+
+- Demo report imports use shared synthetic fixtures and a client-only one-second simulation; no file picker or upload endpoint is exposed — keeps marketing demos separate from real clinical data handling.
+- Import-workflow FAQs are composed identically into public FAQ views and their structured data — keeps visible answers and search metadata consistent without changing admin-managed content.

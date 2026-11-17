@@ -1,4 +1,6 @@
 # Homepage clarity
+- [x] Clarify practice-provided reports across public pages, add import artwork and sample-only demo imports.
+- [x] Verify sample import, contact navigation and phone layouts; reported hook error not reproduced, current build passes.
 - [x] Simplify the homepage journey while retaining the original brand and drawings.
 - [x] Improve phone navigation and demo preview accessibility.
 - [x] Verify homepage, demo switches and contact navigation on desktop and phone; check the reported error (not reproduced; current build succeeds).
