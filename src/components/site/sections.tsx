@@ -237,7 +237,7 @@ export function ContactSection({ as: Tag = "h2" }: { as?: H }) {
   return (
       <section id="contact" className="scroll-mt-20 bg-secondary">
         <div className="mx-auto grid max-w-7xl 2xl:max-w-[90rem] gap-12 px-6 lg:px-10 py-24 md:grid-cols-2">
-          <div data-reveal className="reveal">
+          <div data-reveal className="reveal md:sticky md:top-32 md:self-start">
             <Eyebrow>Contact</Eyebrow>
             <Tag className="font-display text-4xl text-primary md:text-5xl">Let’s look at your reports together</Tag>
             <p className="mt-4 text-lg text-muted-foreground">Tell us which routine search gives you the biggest headache. We can start with a low-pressure 15-minute chat about how a visual dashboard could help.</p>

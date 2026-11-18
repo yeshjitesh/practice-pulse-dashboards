@@ -36,7 +36,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   useReveal();
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background text-foreground">
+    <div className="min-h-screen overflow-x-clip bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-7xl 2xl:max-w-[90rem] items-center justify-between px-6 lg:px-10 py-4">
           <Link to="/" aria-label="PracticeMD home"><Logo subtitle /></Link>
