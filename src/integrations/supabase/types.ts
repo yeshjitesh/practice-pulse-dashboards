@@ -135,6 +135,7 @@ export type Database = {
           answer: string
           created_at: string
           id: string
+          is_published: boolean
           question: string
           sort_order: number
         }
@@ -142,6 +143,7 @@ export type Database = {
           answer: string
           created_at?: string
           id?: string
+          is_published?: boolean
           question: string
           sort_order?: number
         }
@@ -149,6 +151,7 @@ export type Database = {
           answer?: string
           created_at?: string
           id?: string
+          is_published?: boolean
           question?: string
           sort_order?: number
         }
@@ -159,6 +162,7 @@ export type Database = {
           author: string
           created_at: string
           id: string
+          is_published: boolean
           quote: string
           role: string
           sort_order: number
@@ -167,6 +171,7 @@ export type Database = {
           author: string
           created_at?: string
           id?: string
+          is_published?: boolean
           quote: string
           role?: string
           sort_order?: number
@@ -175,6 +180,7 @@ export type Database = {
           author?: string
           created_at?: string
           id?: string
+          is_published?: boolean
           quote?: string
           role?: string
           sort_order?: number
