@@ -33,7 +33,7 @@ export function legalSchema(path: string, name: string, description: string) {
       inLanguage: "en-GB",
       dateModified: "2026-11-06",
       isPartOf: { "@type": "WebSite", name: "PracticeMD", url: "https://practicemd.uk/" },
-      publisher: { "@type": "Organization", name: "PracticeMD", alternateName: "RotaCare UK", url: "https://practicemd.uk/", sameAs: ["https://rotacare.uk"] },
+      publisher: { "@type": "Organization", name: "PracticeMD", alternateName: "RotaCare UK", url: "https://practicemd.uk/", sameAs: ["https://rotacare.uk", "https://www.linkedin.com/company/rotacare-uk/"] },
     }),
   };
 }

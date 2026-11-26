@@ -1,6 +1,6 @@
 import { ChatWidget } from "@/components/chat/ChatWidget";
 import { useEffect, useState, type ReactNode } from "react";
-import { Menu, X } from "lucide-react";
+import { Linkedin, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "@/components/brand/Logo";
@@ -77,6 +77,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <Link to="/terms" className="hover:text-primary-foreground">Terms</Link>
             <Link to="/accessibility" className="hover:text-primary-foreground">Accessibility</Link>
             <button type="button" onClick={openCookieSettings} className="hover:text-primary-foreground">Cookie settings</button>
+            <a href="https://www.linkedin.com/company/rotacare-uk/" target="_blank" rel="noopener noreferrer" aria-label="PracticeMD on LinkedIn" className="inline-flex items-center gap-1.5 hover:text-primary-foreground"><Linkedin className="h-4 w-4" aria-hidden="true" /> LinkedIn</a>
           </nav>
           <div className="text-center text-sm text-primary-foreground/80 md:text-right"><p>© {new Date().getFullYear()} PracticeMD · practicemd.uk</p><p className="mt-1 text-xs text-primary-foreground/70">Formerly known as RotaCare UK (<a href="https://rotacare.uk" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-primary-foreground">rotacare.uk</a>)</p></div>
         </div>

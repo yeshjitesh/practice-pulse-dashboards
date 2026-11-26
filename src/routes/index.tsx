@@ -38,7 +38,7 @@ export const Route = createFileRoute("/")({
             "@type": "ProfessionalService",
             name: "PracticeMD",
             alternateName: "RotaCare UK",
-            sameAs: ["https://rotacare.uk"],
+            sameAs: ["https://rotacare.uk", "https://www.linkedin.com/company/rotacare-uk/"],
             url: "https://practicemd.uk/",
             logo: "https://practicemd.uk/icon-512.png",
             image: "https://practicemd.uk/og-image.jpg",

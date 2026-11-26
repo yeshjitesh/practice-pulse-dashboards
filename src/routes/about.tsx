@@ -51,6 +51,7 @@ function AboutPage() {
         <h2 className="font-serif text-3xl text-primary md:text-4xl">From RotaCare UK to PracticeMD</h2>
         <p className="mt-6 text-muted-foreground">PracticeMD was formerly known as RotaCare UK. We've grown from rotas into dashboards that cover the whole practice, from appointments and QOF to finance and CQC readiness.</p>
         <p className="mt-4 font-medium text-primary">Founded by Yesh Jitesh</p>
+        <p className="mt-2 text-sm"><a href="https://www.linkedin.com/company/rotacare-uk/" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:text-accent">Follow PracticeMD on LinkedIn</a></p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild variant="brand"><Link to="/contact">Let's talk about your practice</Link></Button>
           <Button asChild variant="pill"><Link to="/demos">Explore the demos</Link></Button>
