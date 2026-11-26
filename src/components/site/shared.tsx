@@ -45,6 +45,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <Link to="/demos" className={`hidden md:inline ${navLink}`} activeProps={navActive}>Demos</Link>
             <Link to="/how-it-works" className={`hidden md:inline ${navLink}`} activeProps={navActive}>How it works</Link>
             <Link to="/faq" className={`hidden md:inline ${navLink}`} activeProps={navActive}>FAQ</Link>
+            <Link to="/about" className={`hidden md:inline ${navLink}`} activeProps={navActive}>About</Link>
             <Button asChild variant="brand" className="hidden sm:inline-flex"><Link to="/contact">Get in touch</Link></Button>
             <Button variant="ghost" size="icon" className="md:hidden text-primary" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} aria-controls="mobile-navigation" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X /> : <Menu />}</Button>
           </nav>
@@ -54,6 +55,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
           <Link to="/demos" onClick={() => setMenuOpen(false)} className="py-3 text-primary">Demos</Link>
           <Link to="/how-it-works" onClick={() => setMenuOpen(false)} className="py-3 text-primary">How it works</Link>
           <Link to="/faq" onClick={() => setMenuOpen(false)} className="py-3 text-primary">FAQ</Link>
+          <Link to="/about" onClick={() => setMenuOpen(false)} className="py-3 text-primary">About</Link>
           <Button asChild variant="brand" className="mt-2"><Link to="/contact" onClick={() => setMenuOpen(false)}>Get in touch</Link></Button>
         </nav>}
       </header>
@@ -68,6 +70,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <Link to="/demos" className="hover:text-primary-foreground">Demos</Link>
             <Link to="/how-it-works" className="hover:text-primary-foreground">How it works</Link>
             <Link to="/faq" className="hover:text-primary-foreground">FAQ</Link>
+            <Link to="/about" className="hover:text-primary-foreground">About</Link>
             <Link to="/contact" className="hover:text-primary-foreground">Contact</Link>
             <Link to="/privacy" className="hover:text-primary-foreground">Privacy</Link>
             <Link to="/cookies" className="hover:text-primary-foreground">Cookies</Link>
