@@ -75,7 +75,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <Link to="/accessibility" className="hover:text-primary-foreground">Accessibility</Link>
             <button type="button" onClick={openCookieSettings} className="hover:text-primary-foreground">Cookie settings</button>
           </nav>
-          <span className="text-sm text-primary-foreground/80">© {new Date().getFullYear()} PracticeMD · practicemd.uk</span>
+          <div className="text-center text-sm text-primary-foreground/80 md:text-right"><p>© {new Date().getFullYear()} PracticeMD · practicemd.uk</p><p className="mt-1 text-xs text-primary-foreground/70">Formerly known as RotaCare UK (<a href="https://rotacare.uk" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-primary-foreground">rotacare.uk</a>)</p></div>
         </div>
       </footer>
     </div>
