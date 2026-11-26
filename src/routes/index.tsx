@@ -37,6 +37,8 @@ export const Route = createFileRoute("/")({
             "@context": "https://schema.org",
             "@type": "ProfessionalService",
             name: "PracticeMD",
+            alternateName: "RotaCare UK",
+            sameAs: ["https://rotacare.uk"],
             url: "https://practicemd.uk/",
             logo: "https://practicemd.uk/icon-512.png",
             image: "https://practicemd.uk/og-image.jpg",
