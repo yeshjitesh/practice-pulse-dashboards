@@ -12,7 +12,7 @@ export const Route = createFileRoute("/faq")({
     const faqs = withImportFaqs(content?.faqs ?? []);
     const scripts = [breadcrumb("/faq", "FAQ")];
     if (faqs.length) scripts.push({ type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((x) => ({ "@type": "Question", name: x.question, acceptedAnswer: { "@type": "Answer", text: x.answer } })) }) });
-    return { ...pageHead("/faq", 'FAQ — Practice management dashboards explained | PracticeMD', 'Plain answers about practice-provided reports, CSV imports, sample demos and data protection. PracticeMD does not connect to live NHS systems.'), scripts };
+    return { ...pageHead("/faq", 'GP Practice Dashboard FAQs | PracticeMD', 'Plain answers about practice-provided reports, CSV imports, sample demos and data protection. PracticeMD does not connect to live NHS systems.'), scripts };
   },
   loader: ({ context }) => context.queryClient.ensureQueryData(contentQuery),
   component: FaqPage,

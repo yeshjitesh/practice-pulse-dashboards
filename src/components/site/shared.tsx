@@ -98,6 +98,7 @@ export function pageHead(path: string, title: string, description: string) {
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "en_GB" },
+      { property: "og:site_name", content: "PracticeMD" },
       { property: "og:url", content: url },
       { property: "og:image", content: OG },
       { property: "og:image:width", content: "1200" },

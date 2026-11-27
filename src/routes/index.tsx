@@ -16,13 +16,16 @@ export const Route = createFileRoute("/")({
   head: () => {
     return {
     meta: [
-      { title: "PracticeMD — Practice management dashboards built for your practice" },
-      { name: "description", content: "Turn practice-supplied CSV reports and spreadsheets into bespoke GP practice dashboards. No live NHS connection. Explore sample demos and talk to PracticeMD." },
+      { title: "GP Practice Dashboards for QOF, CQC & PCNs | PracticeMD" },
+      { name: "description", content: "Turn EMIS Web and SystmOne report exports into clear GP practice dashboards for QOF, CQC, access and PCN IIF. No live NHS connection. Try the demos." },
       { name: "robots", content: "index, follow, max-image-preview:large" },
       { property: "og:title", content: "PracticeMD — Bespoke practice dashboards" },
       { property: "og:description", content: "Clear GP practice dashboards built around your imported reports, not live NHS connections." },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "en_GB" },
+      { property: "og:site_name", content: "PracticeMD" },
+      { property: "og:image", content: "https://practicemd.uk/og-image.jpg" },
+      { name: "twitter:image", content: "https://practicemd.uk/og-image.jpg" },
       { property: "og:url", content: "https://practicemd.uk/" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "PracticeMD — Bespoke practice dashboards" },
@@ -44,6 +47,8 @@ export const Route = createFileRoute("/")({
             image: "https://practicemd.uk/og-image.jpg",
             description: "Custom practice management dashboards tailored to the way each GP practice works.",
             areaServed: { "@type": "Country", name: "United Kingdom" },
+            founder: { "@type": "Person", name: "Yesh Jitesh" },
+            knowsAbout: ["QOF dashboards", "CQC readiness", "PCN IIF and ARRS tracking", "GP appointments and access reporting", "EMIS Web and SystmOne report imports", "Practice finance and staffing analytics"],
           },
           { "@context": "https://schema.org", "@type": "WebSite", name: "PracticeMD", url: "https://practicemd.uk/", inLanguage: "en-GB" },
         ]),

@@ -9,8 +9,11 @@ import { SiteShell, pageHead, breadcrumb, Eyebrow } from "@/components/site/shar
 export const Route = createFileRoute("/demos")({
   staticData: { sitemap: true },
   head: () => ({
-    ...pageHead("/demos", "15 demo dashboards for GP practices — QOF, access, CQC, finance & more | PracticeMD", "Explore 15 interactive sample dashboards for UK GP practices and PCNs: QOF, Enhanced Services, CQC, rotas, appointments, prescribing, finance, IIF and more. Example data only."),
-    scripts: [breadcrumb("/demos", "Demo dashboards")],
+    ...pageHead("/demos", "GP Dashboard Demos: QOF, CQC, PCN IIF | PracticeMD", "Try 15 interactive sample dashboards for UK GP practices and PCNs: QOF, CQC readiness, appointments, prescribing, finance, IIF and ARRS. Example data only."),
+    scripts: [
+      breadcrumb("/demos", "Demo dashboards"),
+      { type: "application/ld+json", children: JSON.stringify({ "@context": "https://schema.org", "@type": "ItemList", name: "PracticeMD sample dashboards", itemListElement: demos.map((d, i) => ({ "@type": "ListItem", position: i + 1, item: { "@type": "SoftwareApplication", name: d.name, description: d.intro, applicationCategory: "BusinessApplication", operatingSystem: "Web", url: "https://practicemd.uk/demos" } })) }) },
+    ],
   }),
   component: DemosPage,
 });
