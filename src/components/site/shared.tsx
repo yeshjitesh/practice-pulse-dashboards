@@ -74,6 +74,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
             <Link to="/contact" className="hover:text-primary-foreground">Contact</Link>
             <Link to="/privacy" className="hover:text-primary-foreground">Privacy</Link>
             <Link to="/cookies" className="hover:text-primary-foreground">Cookies</Link>
+            <Link to="/gdpr" className="hover:text-primary-foreground">UK GDPR</Link>
             <Link to="/terms" className="hover:text-primary-foreground">Terms</Link>
             <Link to="/accessibility" className="hover:text-primary-foreground">Accessibility</Link>
             <button type="button" onClick={openCookieSettings} className="hover:text-primary-foreground">Cookie settings</button>

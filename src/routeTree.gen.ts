@@ -19,6 +19,7 @@ import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as DemosRouteImport } from './routes/demos'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as FeaturesRouteImport } from './routes/features'
+import { Route as GdprRouteImport } from './routes/gdpr'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -74,6 +75,11 @@ const FeaturesRoute = FeaturesRouteImport.update({
   path: '/features',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GdprRoute = GdprRouteImport.update({
+  id: '/gdpr',
+  path: '/gdpr',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/demos': typeof DemosRoute
   '/faq': typeof FaqRoute
   '/features': typeof FeaturesRoute
+  '/gdpr': typeof GdprRoute
   '/how-it-works': typeof HowItWorksRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -122,6 +129,7 @@ export interface FileRoutesByTo {
   '/demos': typeof DemosRoute
   '/faq': typeof FaqRoute
   '/features': typeof FeaturesRoute
+  '/gdpr': typeof GdprRoute
   '/how-it-works': typeof HowItWorksRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -139,6 +147,7 @@ export interface FileRoutesById {
   '/demos': typeof DemosRoute
   '/faq': typeof FaqRoute
   '/features': typeof FeaturesRoute
+  '/gdpr': typeof GdprRoute
   '/how-it-works': typeof HowItWorksRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/demos'
     | '/faq'
     | '/features'
+    | '/gdpr'
     | '/how-it-works'
     | '/privacy'
     | '/sitemap.xml'
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/demos'
     | '/faq'
     | '/features'
+    | '/gdpr'
     | '/how-it-works'
     | '/privacy'
     | '/sitemap.xml'
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '/demos'
     | '/faq'
     | '/features'
+    | '/gdpr'
     | '/how-it-works'
     | '/privacy'
     | '/sitemap.xml'
@@ -206,6 +218,7 @@ export interface RootRouteChildren {
   DemosRoute: typeof DemosRoute
   FaqRoute: typeof FaqRoute
   FeaturesRoute: typeof FeaturesRoute
+  GdprRoute: typeof GdprRoute
   HowItWorksRoute: typeof HowItWorksRoute
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FeaturesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gdpr': {
+      id: '/gdpr'
+      path: '/gdpr'
+      fullPath: '/gdpr'
+      preLoaderRoute: typeof GdprRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/how-it-works': {
       id: '/how-it-works'
       path: '/how-it-works'
@@ -326,6 +346,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemosRoute: DemosRoute,
   FaqRoute: FaqRoute,
   FeaturesRoute: FeaturesRoute,
+  GdprRoute: GdprRoute,
   HowItWorksRoute: HowItWorksRoute,
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
