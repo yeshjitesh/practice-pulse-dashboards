@@ -1,21 +1,37 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { pageHead, breadcrumb } from "@/components/site/shared";
 import drawing from "@/assets/terms-drawing.jpg";
 import { legalSchema, LegalPage, CONTACT_EMAIL } from "@/components/site/LegalPage";
 
+const DESC = "The terms for using practicemd.uk: business use only, no clinical advice, demo and chat disclaimers, acceptable use, liability limits and English law.";
+
 export const Route = createFileRoute("/terms")({
   staticData: { sitemap: true },
-  head: () => ({ ...pageHead("/terms", "Terms of Use | PracticeMD", "The terms that apply when you use the PracticeMD website for GP practice dashboards, governed by the law of England and Wales."), scripts: [legalSchema("/terms", "Terms of Use", "The terms that apply when you use the PracticeMD website for GP practice dashboards, governed by the law of England and Wales."), breadcrumb("/terms", "Terms of Use")] }),
-  component: () => (
-    <LegalPage image={drawing} imageAlt="Drawing of a handshake above a signed agreement and fountain pen" eyebrow="Legal" title="Terms of Use" intro="These terms apply to your use of practicemd.uk. By using the site you accept them.">
-      <section><h2>About us</h2><p>This website is run by PracticeMD. Contact: <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.</p></section>
-      <section><h2>Using the site</h2><ul><li>Use the site lawfully and don't try to disrupt or gain unauthorised access to it.</li><li>Don't send patient-identifiable or other confidential clinical information through our forms.</li></ul></section>
-      <section><h2>Information on this site</h2><p>Content is general information about our services and is not professional, clinical or financial advice. Example dashboards and figures are illustrative.</p></section>
-      <section><h2>Our services</h2><p>Any dashboard work is agreed in a separate written contract, which takes priority over these terms.</p></section>
-      <section><h2>Intellectual property</h2><p>The site's content, design, logo and drawings belong to PracticeMD. You may view and share pages for personal or internal practice use, but not copy them for commercial use without permission.</p></section>
-      <section><h2>Liability</h2><p>We work to keep the site accurate and available but can't guarantee it. We aren't liable for indirect losses from using the site. Nothing here limits liability that cannot be limited under English law, such as for death or personal injury caused by negligence, or fraud.</p></section>
-      <section><h2>Links</h2><p>Links to other websites are for convenience; we aren't responsible for their content.</p></section>
-      <section><h2>Law</h2><p>These terms are governed by the law of England and Wales, and its courts have jurisdiction.</p></section>
-    </LegalPage>
-  ),
+  head: () => ({ ...pageHead("/terms", "Terms of Use | PracticeMD", DESC), scripts: [legalSchema("/terms", "Terms of Use", DESC), breadcrumb("/terms", "Terms of Use")] }),
+  component: TermsPage,
 });
+
+function TermsPage() {
+  const mail = <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>;
+  return (
+    <LegalPage image={drawing} imageAlt="Drawing of a handshake above a signed agreement and fountain pen" eyebrow="Legal" title="Terms of Use" intro="These terms apply to your use of practicemd.uk, including its demo dashboards and NEXA chat assistant. By using the site you accept them. If you do not agree, please do not use the site.">
+      <section><h2>1. About us</h2><p>This website is run by PracticeMD (formerly RotaCare UK) ("we", "us"). Contact: {mail}.</p></section>
+      <section><h2>2. Business use</h2><p>The site is intended for people working in or with UK primary care organisations, such as GP practices, PCNs and federations, acting in a business or professional capacity. If you use it on behalf of an organisation, you confirm you are authorised to do so.</p></section>
+      <section><h2>3. No clinical, medical or professional advice</h2><ul><li>Content on this site, including demos, FAQs and chat replies, is general information about our services. It is not clinical, medical, legal, financial, contractual or regulatory advice.</li><li>PracticeMD dashboards are management and reporting tools. They are not medical devices and must not be used to diagnose, treat or make decisions about individual patients.</li><li>Decisions about QOF, CQC, IIF, ARRS, contracts, staffing and finance remain the responsibility of your organisation. Always check figures against your source systems and official guidance.</li><li>In a medical emergency, call 999. For urgent health advice, use NHS 111.</li></ul></section>
+      <section><h2>4. Demo dashboards and sample data</h2><p>All demo dashboards and sample imports use made-up example data. Figures, targets, trends and comparisons are illustrative only, do not describe any real practice or person, and are not a promise of results.</p></section>
+      <section><h2>5. NEXA chat assistant</h2><ul><li>NEXA is an automated assistant powered by artificial intelligence. Its replies may be incomplete or wrong, and they do not form an offer, quote or contract.</li><li>Do not enter patient information, health data or other confidential information into the chat.</li><li>Only a written agreement signed by us binds PracticeMD. See our <Link to="/privacy">Privacy Policy</Link> for how chat messages are handled.</li></ul></section>
+      <section><h2>6. Acceptable use</h2><p>You must not:</p><ul><li>use the site unlawfully, fraudulently or to harm anyone;</li><li>send patient-identifiable, special category or confidential clinical information through our forms or chat;</li><li>try to gain unauthorised access to the site, its admin area, servers or databases, or test their security without our written permission;</li><li>introduce viruses or harmful code, or overload, disrupt or scrape the site with automated tools;</li><li>try to make the chat assistant produce harmful, misleading or unlawful content;</li><li>send spam or impersonate another person or organisation.</li></ul><p>We may suspend or block access, delete submissions and report unlawful activity to the relevant authorities.</p></section>
+      <section><h2>7. What you send us</h2><p>You confirm that information you send is accurate and that you are entitled to share it. You give us permission to use it to respond to you and to provide and improve our services, as described in our <Link to="/privacy">Privacy Policy</Link>.</p></section>
+      <section><h2>8. Our services and quotes</h2><p>Nothing on this site is an offer capable of acceptance. Any dashboard, import or support work is provided only under a separate written agreement, including a data processing agreement where personal data is involved. That agreement takes priority over these terms.</p></section>
+      <section><h2>9. Intellectual property</h2><p>The site's content, design, text, dashboard layouts, demo data, logo, the names PracticeMD and NEXA, and all drawings belong to us or our licensors. You may view and share pages for internal use at your organisation. You may not copy, reproduce, adapt, sell or use them to build a competing product without our written permission. NHS, EMIS Web, SystmOne, CQC and other names are trademarks of their owners and are used only to describe compatibility; we are not endorsed by or affiliated with them.</p></section>
+      <section><h2>10. Availability and changes</h2><p>The site is provided free of charge "as is" and "as available". We may change, suspend or withdraw any part of it at any time and do not guarantee it will be uninterrupted, error-free or free of viruses. Use your own virus protection.</p></section>
+      <section><h2>11. Links to other websites</h2><p>Links to other websites are for convenience only. We have no control over their content and are not responsible for it.</p></section>
+      <section><h2>12. Our liability</h2><ul><li>Nothing in these terms limits or excludes liability for death or personal injury caused by negligence, fraud or fraudulent misrepresentation, or any other liability that cannot be limited under English law.</li><li>Subject to that, we are not liable, whether in contract, tort (including negligence), breach of statutory duty or otherwise, for any loss arising from use of, or reliance on, the site, its demos or chat replies, including loss of profit, revenue, income, contract payments, funding, data, goodwill or business opportunity, or any indirect or consequential loss.</li><li>Our total liability to you in connection with the site will not exceed £100.</li></ul></section>
+      <section><h2>13. Your responsibility to us</h2><p>If you breach these terms, for example by uploading patient data, misusing the chat or attempting unauthorised access, you are responsible for reasonable losses, costs and claims we suffer as a result, to the extent permitted by law.</p></section>
+      <section><h2>14. Privacy and cookies</h2><p>How we use personal data is explained in our <Link to="/privacy">Privacy Policy</Link>, <Link to="/gdpr">UK GDPR</Link> page and <Link to="/cookies">Cookie Policy</Link>.</p></section>
+      <section><h2>15. Changes to these terms</h2><p>We may update these terms at any time. The date above shows the latest version, and the version in force when you use the site applies.</p></section>
+      <section><h2>16. General</h2><ul><li>If any part of these terms is found invalid, the rest stays in force.</li><li>If we delay enforcing these terms, we can still enforce them later.</li><li>No one other than you and us has any right to enforce these terms under the Contracts (Rights of Third Parties) Act 1999.</li><li>These terms are the whole agreement between you and us about using the site.</li></ul></section>
+      <section><h2>17. Law and disputes</h2><p>These terms, and any dispute about them or the site, are governed by the law of England and Wales, and the courts of England and Wales have exclusive jurisdiction. Please contact us first at {mail} so we can try to resolve any concern informally.</p></section>
+    </LegalPage>
+  );
+}
