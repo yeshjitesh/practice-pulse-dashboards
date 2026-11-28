@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { submitEnquiry } from "@/lib/enquiry.functions";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/site/shared";
 import contactDrawing from "@/assets/contact-drawing.jpg";
@@ -185,6 +186,7 @@ export function FaqSection({ faqs, as: Tag = "h2" }: { faqs: Faq[]; as?: H }) {
 export function ContactSection({ as: Tag = "h2" }: { as?: H }) {
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [error, setError] = useState("");
+  const submit = useServerFn(submitEnquiry);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -207,21 +209,7 @@ export function ContactSection({ as: Tag = "h2" }: { as?: H }) {
     }
     setStatus("sending");
     const d = parsed.data;
-    const { error } = await supabase.from("contact_submissions").insert({
-      name: d.name,
-      email: d.email,
-      practice: d.practice ?? null,
-      message: d.message,
-      phone: d.phone ?? null,
-      job_role: d.job_role ?? null,
-      organisation_type: d.organisation_type ?? null,
-      list_size: d.list_size ?? null,
-      clinical_system: d.clinical_system ?? null,
-      interests: d.interests.length ? d.interests : null,
-      timeline: d.timeline ?? null,
-      contact_preference: d.contact_preference ?? null,
-      heard_about: d.heard_about ?? null,
-    });
+    const error = await submit({ data: d }).then((r) => !r.ok, () => true);
     if (error) {
       window.__lovableEvents?.track?.("project.contact_form_submitted", { result: "error" });
       setStatus("idle");
@@ -247,7 +235,7 @@ export function ContactSection({ as: Tag = "h2" }: { as?: H }) {
           {status === "done" ? (
             <div className="rounded-xl border border-border bg-card p-8 animate-fade-up">
               <h3 className="text-xl font-semibold text-primary">Thank you!</h3>
-              <p className="mt-2 text-muted-foreground">Your message has been received. We'll be in touch soon.</p>
+              <p className="mt-2 text-muted-foreground">Your message has been received. We've emailed you a copy, and we'll be in touch within 1 working day.</p>
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-6 rounded-xl border border-border bg-card p-6 md:p-8">

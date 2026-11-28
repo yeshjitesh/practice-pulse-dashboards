@@ -74,7 +74,7 @@ export function Mail({ intent, onIntentDone, onOpenEnquiry }: { intent?: MailInt
   const folders = box.data?.folders ?? [];
   const counts = box.data?.counts;
   const fromAddress = setup.data?.fromAddress ?? "hello@practicemd.uk";
-  const signature = setup.data?.signatureHtml ? `<p>--<br>${setup.data.signatureHtml}</p>` : "";
+  const signature = setup.data?.signatureHtml ? `<p><br></p><p>--</p>${setup.data.signatureHtml}` : "";
 
   function newMessage(extra: { to?: string; subject?: string; enquiryId?: string } = {}) {
     openCompose({ title: "New message", to: extra.to ?? "", cc: "", bcc: "", subject: extra.subject ?? "", html: `<p><br></p>${signature}`, ...(extra.enquiryId ? { enquiryId: extra.enquiryId } : {}) });
@@ -361,7 +361,7 @@ export function Mail({ intent, onIntentDone, onOpenEnquiry }: { intent?: MailInt
         <PenSquare className="size-4" /> Compose
       </button>
 
-      <MailSettings open={settingsOpen} onOpenChange={setSettingsOpen} signatureHtml={setup.data?.signatureHtml ?? ""} />
+      <MailSettings open={settingsOpen} onOpenChange={setSettingsOpen} signature={setup.data?.signature ?? {}} />
 
       {compose && (
         <Composer key={compose.key} init={compose} fromAddress={fromAddress} onClose={() => setCompose(null)}

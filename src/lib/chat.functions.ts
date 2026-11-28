@@ -136,6 +136,8 @@ export const sendChatMessage = createServerFn({ method: "POST" })
                 .update({ live_agent_requested: true, contact_submission_id: sub.id, updated_at: new Date().toISOString() })
                 .eq("id", convo.id);
               leadSaved = true;
+              const { sendEnquiryConfirmation } = await import("./mail.server");
+              await sendEnquiryConfirmation(sub.id);
               result = "Saved. The team will contact them.";
             }
           }

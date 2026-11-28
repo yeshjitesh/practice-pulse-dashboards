@@ -328,21 +328,27 @@ export type Database = {
       mail_settings: {
         Row: {
           id: number
+          signature: Json | null
           signature_html: string | null
+          templates_seeded: boolean
           updated_at: string
           webhook_id: string | null
           webhook_secret: string | null
         }
         Insert: {
           id?: number
+          signature?: Json | null
           signature_html?: string | null
+          templates_seeded?: boolean
           updated_at?: string
           webhook_id?: string | null
           webhook_secret?: string | null
         }
         Update: {
           id?: number
+          signature?: Json | null
           signature_html?: string | null
+          templates_seeded?: boolean
           updated_at?: string
           webhook_id?: string | null
           webhook_secret?: string | null

@@ -26,3 +26,5 @@
 - Bin purge (30 days) and snooze wake-up run lazily when the mailbox loads, and Follow-up is a date query — no cron job, so no scheduled compute for a single-admin inbox.
 - Send later uses Resend's own scheduled_at (max 30 days, cancel via /emails/{id}/cancel) instead of an app cron; a scheduled message has status "scheduled" and doesn't count as sent until the email.sent webhook arrives.
 - Mail threads link to contact enquiries via mail_threads.enquiry_id (auto-linked by matching email on send/receive); sending a linked email marks a "new" enquiry as replied.
+- All outgoing email HTML goes through brandEmail() in src/lib/email-brand.ts (logo PNG asset, inline styles, 600px card); sendMail wraps unbranded bodies at send time — one brand layout for every email.
+- Contact form saves via the submitEnquiry server function (not a browser insert) so the confirmation email can be sent; sendEnquiryConfirmation never throws and uses a Resend idempotency key per enquiry — the enquiry always saves and is confirmed once.

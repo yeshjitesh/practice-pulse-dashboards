@@ -22,7 +22,7 @@ export async function db() {
 }
 
 /** Call Resend through the connector gateway. Throws with the provider's status and body on failure. */
-export async function resend<T = unknown>(path: string, init: { method?: string; body?: unknown } = {}): Promise<T> {
+export async function resend<T = unknown>(path: string, init: { method?: string; body?: unknown; idempotencyKey?: string } = {}): Promise<T> {
   const lovableKey = process.env["LOVABLE_API_KEY"];
   const resendKey = process.env["RESEND_API_KEY"];
   if (!lovableKey || !resendKey) throw new Error("Email sending is not configured.");
@@ -32,6 +32,7 @@ export async function resend<T = unknown>(path: string, init: { method?: string;
       Authorization: `Bearer ${lovableKey}`,
       "X-Connection-Api-Key": resendKey,
       ...(init.body !== undefined ? { "Content-Type": "application/json" } : {}),
+      ...(init.idempotencyKey ? { "Idempotency-Key": init.idempotencyKey } : {}),
     },
     ...(init.body !== undefined ? { body: JSON.stringify(init.body) } : {}),
   });
@@ -222,4 +223,36 @@ export async function autoLinkEnquiry(sb: Sb, threadId: string, addresses: strin
   const { data: enquiries } = await sb.from("contact_submissions").select("id, email").order("created_at", { ascending: false }).limit(500);
   const match = (enquiries ?? []).find((e) => list.includes(e.email.trim().toLowerCase()));
   if (match) await sb.from("mail_threads").update({ enquiry_id: match.id }).eq("id", threadId);
+}
+
+/** Email a branded confirmation to the person behind an enquiry, once. It lands in Mail (Inbox, unread) linked to the enquiry, so replies thread there. Never throws. */
+export async function sendEnquiryConfirmation(enquiryId: string) {
+  try {
+    const sb = await db();
+    const { data: e } = await sb.from("contact_submissions").select("id, name, email, practice, message, interests, contact_preference, timeline").eq("id", enquiryId).maybeSingle();
+    if (!e) return;
+    const { data: already } = await sb.from("mail_threads").select("id").eq("enquiry_id", enquiryId).eq("has_sent", true).limit(1);
+    if (already?.length) return;
+    const { enquiryConfirmation } = await import("./email-brand");
+    const c = enquiryConfirmation(e);
+    const messageId = `<enquiry-${enquiryId}@${MAIL_DOMAIN}>`;
+    const sent = await resend<{ id: string }>("/emails", {
+      method: "POST", idempotencyKey: `enquiry-confirm-${enquiryId}`,
+      body: { from: `${MAIL_FROM_NAME} <${MAIL_FROM_ADDRESS}>`, to: [e.email], reply_to: MAIL_FROM_ADDRESS, subject: c.subject, html: c.html, text: c.text, headers: { "Message-ID": messageId } },
+    });
+    const { data: dup } = await sb.from("mail_messages").select("id").eq("provider_id", sent.id).maybeSingle();
+    if (dup) return;
+    const { data: t } = await sb.from("mail_threads").insert({
+      subject: c.subject, normalized_subject: normalizeSubject(c.subject), folder: "inbox", unread: true, enquiry_id: enquiryId,
+    }).select("id").single();
+    if (!t) return;
+    const { data: msg } = await sb.from("mail_messages").insert({
+      thread_id: t.id, direction: "out", status: "sent", provider_id: sent.id, message_id_header: messageId,
+      from_address: MAIL_FROM_ADDRESS, from_name: MAIL_FROM_NAME, to_addresses: [e.email], subject: c.subject, html: c.html, text_body: c.text,
+    }).select("id").single();
+    if (msg) await sb.from("mail_events").insert({ message_id: msg.id, type: "sent" });
+    await refreshThread(sb, t.id);
+  } catch (error) {
+    console.error("Enquiry confirmation email failed", error);
+  }
 }

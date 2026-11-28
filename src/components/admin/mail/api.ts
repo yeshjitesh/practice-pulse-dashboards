@@ -76,7 +76,7 @@ export function useMailSettingsActions() {
   return {
     saveTemplate: async (input: Parameters<typeof saveMailTemplate>[0]["data"]) => { const r = await saveTemplate({ data: input }); await qc.invalidateQueries({ queryKey: ["mail-templates"] }); return r; },
     removeTemplate: async (id: string) => { await removeTemplate({ data: { id } }); await qc.invalidateQueries({ queryKey: ["mail-templates"] }); },
-    saveSignature: async (html: string) => { await saveSignature({ data: { html } }); await qc.invalidateQueries({ queryKey: ["mail-setup"] }); },
+    saveSignature: async (sig: Parameters<typeof saveMailSignature>[0]["data"]) => { await saveSignature({ data: sig }); await qc.invalidateQueries({ queryKey: ["mail-setup"] }); },
     link: async (threadId: string, enquiryId: string | null) => {
       await link({ data: { threadId, enquiryId } });
       await Promise.all([qc.invalidateQueries({ queryKey: ["mail"] }), qc.invalidateQueries({ queryKey: ["enquiry-mail"] })]);

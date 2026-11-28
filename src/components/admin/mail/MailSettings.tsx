@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getEmailPreviews } from "@/lib/mail.functions";
 import { Plus, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,19 +12,25 @@ import { useMailSettingsActions, useMailTemplates } from "./api";
 const field = "w-full min-w-0 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-hidden focus:border-accent";
 
 /** Signature and reply templates, edited as plain text. */
-export function MailSettings({ open, onOpenChange, signatureHtml }: { open: boolean; onOpenChange: (o: boolean) => void; signatureHtml: string }) {
+type Sig = { name?: string; role?: string; phone?: string; bookingUrl?: string };
+export function MailSettings({ open, onOpenChange, signature: saved }: { open: boolean; onOpenChange: (o: boolean) => void; signature: Sig }) {
   const templates = useMailTemplates();
   const act = useMailSettingsActions();
-  const [signature, setSignature] = useState("");
+  const [signature, setSignature] = useState({ name: "", role: "", phone: "", bookingUrl: "" });
+  const fetchPreviews = useServerFn(getEmailPreviews);
+  const previews = useQuery({ queryKey: ["mail-previews"], queryFn: () => fetchPreviews(), enabled: open });
   const [savingSig, setSavingSig] = useState(false);
   const [editing, setEditing] = useState<{ id?: string; name: string; body: string } | null>(null);
   const [savingTpl, setSavingTpl] = useState(false);
 
-  useEffect(() => { if (open) { setSignature(htmlToText(signatureHtml)); setEditing(null); } }, [open, signatureHtml]);
+  useEffect(() => {
+    if (open) { setSignature({ name: saved.name ?? "", role: saved.role ?? "", phone: saved.phone ?? "", bookingUrl: saved.bookingUrl ?? "" }); setEditing(null); }
+  }, [open, saved]);
 
   async function saveSignature() {
     setSavingSig(true);
-    try { await act.saveSignature(signature.trim() ? textToHtml(signature) : ""); toast.success("Signature saved"); }
+    if (signature.bookingUrl && !/^https:\/\//i.test(signature.bookingUrl)) { toast.error("The booking link must start with https://"); setSavingSig(false); return; }
+    try { await act.saveSignature(signature); await previews.refetch(); toast.success("Signature saved"); }
     catch { toast.error("Couldn't save the signature."); }
     finally { setSavingSig(false); }
   }
@@ -46,9 +55,15 @@ export function MailSettings({ open, onOpenChange, signatureHtml }: { open: bool
         </DialogHeader>
 
         <section className="space-y-2">
-          <label htmlFor="mail-signature" className="text-sm font-semibold">Signature</label>
-          <textarea id="mail-signature" rows={4} maxLength={2000} value={signature} onChange={(e) => setSignature(e.target.value)} className={field}
-            placeholder={"Yesh Jitesh\nPracticeMD · practicemd.uk"} />
+          <h3 className="text-sm font-semibold">Signature</h3>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {([["name", "Your name", 80, "Yesh Jitesh"], ["role", "Role", 80, "Founder"], ["phone", "Phone", 30, ""], ["bookingUrl", "Booking link", 300, "https://…"]] as const).map(([k, l, max, ph]) => (
+              <label key={k} className="text-xs text-muted-foreground">{l}
+                <input aria-label={l} value={signature[k]} maxLength={max} placeholder={ph} onChange={(e) => setSignature({ ...signature, [k]: e.target.value })} className={`${field} mt-1`} />
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">Shown as a branded card under your emails. Leave the name empty for no signature.</p>
           <div className="flex justify-end">
             <Button size="sm" onClick={saveSignature} disabled={savingSig}>{savingSig && <Loader2 className="animate-spin" />} Save signature</Button>
           </div>
@@ -86,6 +101,17 @@ export function MailSettings({ open, onOpenChange, signatureHtml }: { open: bool
               </li>
             ))}
           </ul>
+        </section>
+
+        <section className="space-y-3 border-t border-border pt-4">
+          <h3 className="text-sm font-semibold">Email previews</h3>
+          <p className="text-xs text-muted-foreground">Every email you send is wrapped in this layout. The logo appears once the site is published.</p>
+          {(previews.data ?? []).map((p) => (
+            <figure key={p.name} className="space-y-1">
+              <figcaption className="text-xs font-medium">{p.name}</figcaption>
+              <iframe title={p.name} srcDoc={p.html} sandbox="" className="h-[28rem] w-full rounded-lg border border-border bg-white" />
+            </figure>
+          ))}
         </section>
       </DialogContent>
     </Dialog>

@@ -87,8 +87,13 @@ export const getMailSetup = createServerFn({ method: "GET" }).handler(async () =
   const m = await import("./mail.server");
     await m.requireAdmin();
   const sb = await m.db();
-  const { data } = await sb.from("mail_settings").select("webhook_id, webhook_secret, signature_html").eq("id", 1).maybeSingle();
-  return { fromAddress: m.MAIL_FROM_ADDRESS, fromName: m.MAIL_FROM_NAME, receiving: !!(data?.webhook_id && data.webhook_secret), signatureHtml: data?.signature_html ?? "" };
+  const { data } = await sb.from("mail_settings").select("webhook_id, webhook_secret, signature_html, signature").eq("id", 1).maybeSingle();
+  const { signatureHtml } = await import("./email-brand");
+  const signature = (data?.signature ?? {}) as { name?: string; role?: string; phone?: string; bookingUrl?: string };
+  return {
+    fromAddress: m.MAIL_FROM_ADDRESS, fromName: m.MAIL_FROM_NAME, receiving: !!(data?.webhook_id && data.webhook_secret),
+    signature, signatureHtml: signatureHtml(signature) || (data?.signature_html ?? ""),
+  };
 });
 
 /** Register the Resend webhook for incoming mail + tracking and switch on open/click tracking. */
@@ -359,6 +364,8 @@ export const sendMail = createServerFn({ method: "POST" })
     const messageId = `<${crypto.randomUUID()}@${m.MAIL_DOMAIN}>`;
     headers["Message-ID"] = messageId;
     const text = htmlToText(data.html);
+    const { brandEmail, isBranded } = await import("./email-brand");
+    const html = isBranded(data.html) ? data.html : brandEmail(data.html);
     let sent: { id: string };
     try {
       sent = await m.resend<{ id: string }>("/emails", {
@@ -366,7 +373,7 @@ export const sendMail = createServerFn({ method: "POST" })
         body: {
           from: `${m.MAIL_FROM_NAME} <${m.MAIL_FROM_ADDRESS}>`, to: data.to,
           ...(data.cc.length ? { cc: data.cc } : {}), ...(data.bcc.length ? { bcc: data.bcc } : {}),
-          reply_to: m.MAIL_FROM_ADDRESS, subject: data.subject || "(no subject)", html: data.html, text, headers,
+          reply_to: m.MAIL_FROM_ADDRESS, subject: data.subject || "(no subject)", html, text, headers,
           ...(data.scheduledAt ? { scheduled_at: new Date(data.scheduledAt).toISOString() } : {}),
           ...(files.length ? { attachments: files.map((f) => ({ filename: f.filename, content: f.base64 })) } : {}),
         },
@@ -386,7 +393,7 @@ export const sendMail = createServerFn({ method: "POST" })
       scheduled_at: data.scheduledAt ? new Date(data.scheduledAt).toISOString() : null,
       in_reply_to: headers["In-Reply-To"] ?? null, references_header: headers["References"] ?? null,
       from_address: m.MAIL_FROM_ADDRESS, from_name: m.MAIL_FROM_NAME, to_addresses: data.to, cc_addresses: data.cc, bcc_addresses: data.bcc,
-      subject: data.subject || "(no subject)", html: data.html, text_body: text,
+      subject: data.subject || "(no subject)", html, text_body: text,
       sent_at: data.scheduledAt ? new Date(data.scheduledAt).toISOString() : new Date().toISOString(),
     };
     const { data: msg, error } = data.draftId
@@ -469,13 +476,17 @@ export const cancelScheduledMail = createServerFn({ method: "POST" })
     return { ok: true as const, hadAttachments: !!files?.length };
   });
 
+const signatureSchema = z.object({
+  name: z.string().trim().max(80), role: z.string().trim().max(80), phone: z.string().trim().max(30),
+  bookingUrl: z.string().trim().max(300).refine((u) => !u || /^https:\/\/[^\s"'<>]+$/i.test(u), "The booking link must start with https://"),
+});
 export const saveMailSignature = createServerFn({ method: "POST" })
-  .inputValidator((d: { html: string }) => z.object({ html: z.string().max(20_000) }).parse(d))
+  .inputValidator((d: z.input<typeof signatureSchema>) => signatureSchema.parse(d))
   .handler(async ({ data }) => {
     const m = await import("./mail.server");
     await m.requireAdmin();
     const sb = await m.db();
-    const { error } = await sb.from("mail_settings").upsert({ id: 1, signature_html: data.html || null, updated_at: new Date().toISOString() });
+    const { error } = await sb.from("mail_settings").upsert({ id: 1, signature: data, signature_html: null, updated_at: new Date().toISOString() });
     if (error) throw new Error("Couldn't save the signature.");
     return { ok: true };
   });
@@ -484,6 +495,13 @@ export const listMailTemplates = createServerFn({ method: "GET" }).handler(async
   const m = await import("./mail.server");
   await m.requireAdmin();
   const sb = await m.db();
+  const { data: settings } = await sb.from("mail_settings").select("templates_seeded").eq("id", 1).maybeSingle();
+  if (!settings?.templates_seeded) {
+    const { STARTER_TEMPLATES } = await import("./email-brand");
+    const { count } = await sb.from("mail_templates").select("id", { count: "exact", head: true });
+    if (!count) await sb.from("mail_templates").insert(STARTER_TEMPLATES);
+    await sb.from("mail_settings").upsert({ id: 1, templates_seeded: true });
+  }
   const { data } = await sb.from("mail_templates").select("id, name, html, updated_at").order("name");
   return data ?? [];
 });
@@ -541,3 +559,18 @@ export const getEnquiryMail = createServerFn({ method: "POST" })
       : { data: [] };
     return [...(linked ?? []), ...(byEmail ?? [])].slice(0, 20);
   });
+
+/** Branded previews for Admin: the enquiry confirmation and a sample Mail email with the current signature. */
+export const getEmailPreviews = createServerFn({ method: "GET" }).handler(async () => {
+  const m = await import("./mail.server");
+  await m.requireAdmin();
+  const sb = await m.db();
+  const b = await import("./email-brand");
+  const { data } = await sb.from("mail_settings").select("signature").eq("id", 1).maybeSingle();
+  const sig = b.signatureHtml((data?.signature ?? {}) as Record<string, string>);
+  const sample = b.STARTER_TEMPLATES[0]!.html.replace("[name]", "Sam") + (sig ? `<p>--</p>${sig}` : "");
+  return [
+    { name: "Contact confirmation (sent automatically)", html: b.enquiryConfirmation({ name: "Sam Patel", email: "sam@example.nhs.uk", practice: "Riverside Surgery", message: "We'd like a dashboard for our QOF searches.", interests: ["QOF tracking"], contact_preference: "Email" }).html },
+    { name: "Email from Mail (with your signature)", html: b.brandEmail(sample) },
+  ];
+});
