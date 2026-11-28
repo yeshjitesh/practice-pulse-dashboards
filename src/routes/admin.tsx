@@ -10,7 +10,7 @@ import { useAdminData } from "@/components/admin/shared";
 import { Overview, type AdminTab } from "@/components/admin/Overview";
 import { Enquiries } from "@/components/admin/Enquiries";
 import { Chats, Faqs, Testimonials } from "@/components/admin/Content";
-import { Mail } from "@/components/admin/mail/Mail";
+import { Mail, type MailIntent } from "@/components/admin/mail/Mail";
 
 export const Route = createFileRoute("/admin")({
   staticData: { sitemap: false },
@@ -36,6 +36,8 @@ function Admin() {
   const navigate = useNavigate();
   const lock = useServerFn(lockAdmin);
   const [tab, setTab] = useState<AdminTab>("overview");
+  const [mailIntent, setMailIntent] = useState<MailIntent | null>(null);
+  const [focusEnquiry, setFocusEnquiry] = useState<string | null>(null);
   const newCount = (data?.messages ?? []).filter((m) => m.status === "new").length;
   const contactChats = (data?.chats ?? []).filter((c) => c.live_agent_requested).length;
   const nav: { id: AdminTab; label: string; icon: typeof Inbox; badge?: number }[] = [
@@ -81,8 +83,12 @@ function Admin() {
         </aside>
         <main className="min-w-0">
           {tab === "overview" && <Overview go={go} />}
-          {tab === "mail" && <Mail />}
-          {tab === "enquiries" && <Enquiries />}
+          {tab === "mail" && <Mail intent={mailIntent} onIntentDone={() => setMailIntent(null)} onOpenEnquiry={(id) => { setFocusEnquiry(id); go("enquiries"); }} />}
+          {tab === "enquiries" && (
+            <Enquiries focusId={focusEnquiry}
+              onEmail={(e) => { setMailIntent({ kind: "compose", to: e.email, subject: "Your PracticeMD enquiry", enquiryId: e.id }); go("mail"); }}
+              onOpenThread={(threadId) => { setMailIntent({ kind: "open", threadId }); go("mail"); }} />
+          )}
           {tab === "chats" && <Chats />}
           {tab === "faqs" && <Faqs />}
           {tab === "testimonials" && <Testimonials />}

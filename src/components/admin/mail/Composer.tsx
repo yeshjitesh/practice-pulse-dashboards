@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bold, Italic, Underline, List, ListOrdered, Link2, Paperclip, X, Minus, Maximize2, Trash2, Send, Loader2 } from "lucide-react";
+import { Bold, Italic, Underline, List, ListOrdered, Link2, Paperclip, X, Minus, Maximize2, Trash2, Send, Loader2, Clock, FileText, Save } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { saveMailDraft, discardMailDraft, sendMail } from "@/lib/mail.functions";
-import { MAX_ATTACHMENT_BYTES, isEmail, splitRecipients } from "@/lib/mail-utils";
-import { formatBytes } from "./api";
+import { MAX_ATTACHMENT_BYTES, isEmail, scheduleProblem, splitRecipients } from "@/lib/mail-utils";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { formatBytes, useMailSettingsActions, useMailTemplates, whenLabel } from "./api";
+import { TimeMenu } from "./TimeMenu";
 
 export type ComposeInit = {
   key: number;
@@ -16,6 +20,7 @@ export type ComposeInit = {
   to: string; cc: string; bcc: string;
   subject: string;
   html: string;
+  enquiryId?: string;
 };
 
 type FileItem = { id: string; file: File };
@@ -25,6 +30,8 @@ export function Composer({ init, fromAddress, onClose, onSent }: { init: Compose
   const save = useServerFn(saveMailDraft);
   const discard = useServerFn(discardMailDraft);
   const send = useServerFn(sendMail);
+  const templates = useMailTemplates();
+  const settings = useMailSettingsActions();
   const [to, setTo] = useState(init.to);
   const [cc, setCc] = useState(init.cc);
   const [bcc, setBcc] = useState(init.bcc);
@@ -90,7 +97,23 @@ export function Composer({ init, fromAddress, onClose, onSent }: { init: Compose
     setFiles((prev) => [...prev, ...next].slice(0, 10));
   }
 
-  async function onSend() {
+  async function insertTemplate(html: string) {
+    const { default: DOMPurify } = await import("dompurify");
+    editor.current?.focus();
+    document.execCommand("insertHTML", false, DOMPurify.sanitize(html));
+    scheduleSave();
+  }
+
+  async function saveAsTemplate() {
+    const html = editor.current?.innerHTML ?? "";
+    if (!(editor.current?.textContent ?? "").trim()) { toast.error("Write something first, then save it as a template."); return; }
+    const name = window.prompt("Template name", subject.replace(/^\s*(re|fwd?)\s*:\s*/i, "").slice(0, 80))?.trim();
+    if (!name) return;
+    try { await settings.saveTemplate({ name: name.slice(0, 80), html }); toast.success("Saved as a template"); }
+    catch { toast.error("Couldn't save the template."); }
+  }
+
+  async function onSend(at?: Date) {
     const f = fields();
     const bad = [...splitRecipients(to), ...splitRecipients(cc), ...splitRecipients(bcc)].filter((a) => !isEmail(a));
     if (bad.length) { toast.error(`Check these addresses: ${bad.join(", ")}`); return; }
@@ -105,10 +128,12 @@ export function Composer({ init, fromAddress, onClose, onSent }: { init: Compose
         ...(draftId.current ? { draftId: draftId.current } : {}),
         ...(threadId.current ? { threadId: threadId.current } : {}),
         ...(followUp ? { followUpDays: Number(followUp) } : {}),
+        ...(at ? { scheduledAt: at.toISOString() } : {}),
+        ...(init.enquiryId ? { enquiryId: init.enquiryId } : {}),
       } });
       if (!result.ok) { toast.error(result.error); return; }
-      toast.success("Email sent");
-      await qc.invalidateQueries({ queryKey: ["mail"] });
+      toast.success(at ? `Scheduled for ${whenLabel(at)}` : "Email sent");
+      await Promise.all([qc.invalidateQueries({ queryKey: ["mail"] }), qc.invalidateQueries({ queryKey: ["admin-data"] }), qc.invalidateQueries({ queryKey: ["enquiry-mail"] })]);
       onSent(result.threadId);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Couldn't send this email.");
@@ -165,6 +190,17 @@ export function Composer({ init, fromAddress, onClose, onSent }: { init: Compose
             ))}
             <button type="button" onMouseDown={(e) => e.preventDefault()} aria-label="Insert link" className="rounded p-1.5 text-muted-foreground hover:bg-secondary hover:text-foreground"
               onClick={() => { const url = window.prompt("Link address (https://…)"); if (url && /^(https?:|mailto:)/i.test(url)) exec("createLink", url); }}><Link2 className="size-4" /></button>
+            <DropdownMenu>
+              <DropdownMenuTrigger onMouseDown={(e) => e.preventDefault()} aria-label="Templates" title="Templates"
+                className="ml-auto flex items-center gap-1 rounded p-1.5 text-xs text-muted-foreground hover:bg-secondary hover:text-foreground"><FileText className="size-4" /> Templates</DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="max-w-72">
+                <DropdownMenuLabel>Insert a template</DropdownMenuLabel>
+                {(templates.data ?? []).map((t) => <DropdownMenuItem key={t.id} onSelect={() => void insertTemplate(t.html)}><span className="truncate">{t.name}</span></DropdownMenuItem>)}
+                {templates.data?.length === 0 && <p className="px-2 py-1.5 text-xs text-muted-foreground">No templates yet.</p>}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => void saveAsTemplate()}><Save /> Save this email as a template</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div ref={editor} contentEditable suppressContentEditableWarning role="textbox" aria-multiline="true" aria-label="Message body"
             onInput={scheduleSave}
@@ -181,7 +217,13 @@ export function Composer({ init, fromAddress, onClose, onSent }: { init: Compose
             </ul>
           )}
           <div className="flex flex-wrap items-center gap-2 border-t border-border px-4 py-3">
-            <Button onClick={onSend} disabled={sending} className="rounded-full">{sending ? <Loader2 className="animate-spin" /> : <Send />} Send</Button>
+            <div className="flex items-center">
+              <Button onClick={() => void onSend()} disabled={sending} className="rounded-l-full rounded-r-none">{sending ? <Loader2 className="animate-spin" /> : <Send />} Send</Button>
+              <TimeMenu label="Schedule send" heading="Schedule send" confirmLabel="Schedule send" validate={(d) => scheduleProblem(d)} onPick={(d) => void onSend(d)}
+                triggerClassName="flex h-9 items-center rounded-r-full border-l border-primary-foreground/25 bg-primary px-2.5 text-primary-foreground hover:bg-primary/90 disabled:opacity-50">
+                <Clock className="size-4" />
+              </TimeMenu>
+            </div>
             <input ref={fileInput} type="file" multiple className="sr-only" onChange={(e) => { addFiles(e.target.files); e.target.value = ""; }} aria-label="Attach files" />
             <button type="button" onClick={() => fileInput.current?.click()} className="rounded-full p-2 text-muted-foreground hover:bg-secondary hover:text-foreground" aria-label="Attach files"><Paperclip className="size-4" /></button>
             <select value={followUp} onChange={(e) => setFollowUp(e.target.value)} aria-label="Follow-up reminder"

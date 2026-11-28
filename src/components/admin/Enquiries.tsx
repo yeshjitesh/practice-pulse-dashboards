@@ -1,6 +1,9 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getEnquiryMail } from "@/lib/mail.functions";
 import { toast } from "sonner";
-import { Download, Mail, Pencil, Plus, Search, Trash2, ChevronDown } from "lucide-react";
+import { Download, Mail, Pencil, Plus, Search, Trash2, ChevronDown, MessagesSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ENQUIRY_STATUSES, enquiriesToCsv, filterEnquiries, type EnquiryStatus } from "@/lib/admin-insights";
@@ -11,12 +14,13 @@ const DETAIL_FIELDS = [
   ["Clinical system", "clinical_system"], ["Timeline", "timeline"], ["Prefers", "contact_preference"], ["Heard via", "heard_about"],
 ] as const;
 
-export function Enquiries() {
+export function Enquiries({ onEmail, onOpenThread, focusId }: { onEmail?: (e: Enquiry) => void; onOpenThread?: (threadId: string) => void; focusId?: string | null } = {}) {
   const { data } = useAdminData();
   const change = useAdminChange();
   const [status, setStatus] = useState<EnquiryStatus | "all">("all");
   const [search, setSearch] = useState("");
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [openId, setOpenId] = useState<string | null>(focusId ?? null);
+  useEffect(() => { if (focusId) { setOpenId(focusId); setStatus("all"); setSearch(""); } }, [focusId]);
   const [editing, setEditing] = useState<Enquiry | "new" | null>(null);
   const all = data?.messages ?? [];
   const list = useMemo(() => filterEnquiries(all, status, search), [all, status, search]);
@@ -98,6 +102,7 @@ export function Enquiries() {
                       {e.interests?.length ? <div className="min-w-0 break-words sm:col-span-2"><dt className="inline text-muted-foreground">Interested in: </dt><dd className="inline">{e.interests.join(", ")}</dd></div> : null}
                     </dl>
                     <p className="mt-3 whitespace-pre-wrap break-words rounded-lg bg-background p-3 text-sm">{e.message}</p>
+                    <EnquiryEmails enquiryId={e.id} {...(onOpenThread ? { onOpen: onOpenThread } : {})} />
                     <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
                       <label className="flex items-center gap-2 text-sm">
                         <span className="text-muted-foreground">Status</span>
@@ -106,7 +111,9 @@ export function Enquiries() {
                         </select>
                       </label>
                       <div className="flex flex-wrap gap-2 sm:ml-auto">
-                        <Button asChild variant="brand" size="sm"><a href={`mailto:${e.email}?subject=Re: your PracticeMD enquiry`}><Mail /> Reply</a></Button>
+                        {onEmail
+                          ? <Button variant="brand" size="sm" onClick={() => onEmail(e)}><Mail /> Email</Button>
+                          : <Button asChild variant="brand" size="sm"><a href={`mailto:${e.email}?subject=Re: your PracticeMD enquiry`}><Mail /> Reply</a></Button>}
                         <Button variant="pill" size="sm" onClick={() => setEditing(e)}><Pencil /> Edit</Button>
                         <Button variant="pill" size="sm" onClick={() => remove(e)} className="text-destructive"><Trash2 /> Delete</Button>
                       </div>
@@ -177,5 +184,33 @@ function EnquiryDialog({ value, onClose }: { value: Enquiry | "new" | null; onCl
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function EnquiryEmails({ enquiryId, onOpen }: { enquiryId: string; onOpen?: (threadId: string) => void }) {
+  const fetchMail = useServerFn(getEnquiryMail);
+  const { data, isLoading } = useQuery({ queryKey: ["enquiry-mail", enquiryId], queryFn: () => fetchMail({ data: { enquiryId } }) });
+  return (
+    <div className="mt-3">
+      <h4 className="mb-1.5 flex items-center gap-1.5 text-xs font-medium text-muted-foreground"><MessagesSquare className="size-3.5" /> Emails</h4>
+      {isLoading ? <p className="text-xs text-muted-foreground">Loading…</p>
+        : !data?.length ? <p className="text-xs text-muted-foreground">No emails with this person yet.</p>
+        : (
+          <ul className="space-y-1">
+            {data.map((t) => (
+              <li key={t.id}>
+                <button type="button" disabled={!onOpen} onClick={() => onOpen?.(t.id)}
+                  className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-left text-sm hover:border-accent">
+                  <span className="min-w-0">
+                    <span className={`block truncate ${t.unread ? "font-semibold" : ""}`}>{t.subject || "(no subject)"}</span>
+                    <span className="block truncate text-xs text-muted-foreground">{t.snippet}</span>
+                  </span>
+                  <span className="shrink-0 text-xs text-muted-foreground">{formatDate(t.last_message_at)}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+    </div>
   );
 }

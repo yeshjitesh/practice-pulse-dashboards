@@ -265,6 +265,7 @@ export type Database = {
           message_id_header: string | null
           provider_id: string | null
           references_header: string | null
+          scheduled_at: string | null
           sent_at: string
           status: string
           subject: string
@@ -285,6 +286,7 @@ export type Database = {
           message_id_header?: string | null
           provider_id?: string | null
           references_header?: string | null
+          scheduled_at?: string | null
           sent_at?: string
           status?: string
           subject?: string
@@ -305,6 +307,7 @@ export type Database = {
           message_id_header?: string | null
           provider_id?: string | null
           references_header?: string | null
+          scheduled_at?: string | null
           sent_at?: string
           status?: string
           subject?: string
@@ -325,21 +328,48 @@ export type Database = {
       mail_settings: {
         Row: {
           id: number
+          signature_html: string | null
           updated_at: string
           webhook_id: string | null
           webhook_secret: string | null
         }
         Insert: {
           id?: number
+          signature_html?: string | null
           updated_at?: string
           webhook_id?: string | null
           webhook_secret?: string | null
         }
         Update: {
           id?: number
+          signature_html?: string | null
           updated_at?: string
           webhook_id?: string | null
           webhook_secret?: string | null
+        }
+        Relationships: []
+      }
+      mail_templates: {
+        Row: {
+          created_at: string
+          html: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          html?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          html?: string
+          id?: string
+          name?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -348,6 +378,7 @@ export type Database = {
           binned_at: string | null
           created_at: string
           custom_folder_id: string | null
+          enquiry_id: string | null
           folder: string
           follow_up_at: string | null
           has_attachments: boolean
@@ -360,6 +391,7 @@ export type Database = {
           participants: string
           previous_folder: string | null
           snippet: string
+          snoozed_until: string | null
           starred: boolean
           subject: string
           unread: boolean
@@ -368,6 +400,7 @@ export type Database = {
           binned_at?: string | null
           created_at?: string
           custom_folder_id?: string | null
+          enquiry_id?: string | null
           folder?: string
           follow_up_at?: string | null
           has_attachments?: boolean
@@ -380,6 +413,7 @@ export type Database = {
           participants?: string
           previous_folder?: string | null
           snippet?: string
+          snoozed_until?: string | null
           starred?: boolean
           subject?: string
           unread?: boolean
@@ -388,6 +422,7 @@ export type Database = {
           binned_at?: string | null
           created_at?: string
           custom_folder_id?: string | null
+          enquiry_id?: string | null
           folder?: string
           follow_up_at?: string | null
           has_attachments?: boolean
@@ -400,6 +435,7 @@ export type Database = {
           participants?: string
           previous_folder?: string | null
           snippet?: string
+          snoozed_until?: string | null
           starred?: boolean
           subject?: string
           unread?: boolean
@@ -410,6 +446,13 @@ export type Database = {
             columns: ["custom_folder_id"]
             isOneToOne: false
             referencedRelation: "mail_folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mail_threads_enquiry_id_fkey"
+            columns: ["enquiry_id"]
+            isOneToOne: false
+            referencedRelation: "contact_submissions"
             referencedColumns: ["id"]
           },
         ]

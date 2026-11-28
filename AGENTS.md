@@ -23,4 +23,6 @@
 - Mail tables (mail_*) and the mail-attachments bucket have RLS on with no policies and only service_role grants — mail is never readable from browser clients.
 - Inbound mail and delivery events arrive at /api/public/resend-webhook, verified with the Svix signature against the signing secret stored in mail_settings (written by "Turn on incoming mail") — no manual secret copy needed.
 - Email HTML is shown only via EmailFrame (DOMPurify + sandboxed iframe without scripts + CSP blocking remote images until allowed) — never render email HTML directly in the admin page.
-- Bin purge (30 days) runs lazily when the mailbox loads and Follow-up is a date query, not a cron job — avoids scheduled compute for a single-admin inbox.
+- Bin purge (30 days) and snooze wake-up run lazily when the mailbox loads, and Follow-up is a date query — no cron job, so no scheduled compute for a single-admin inbox.
+- Send later uses Resend's own scheduled_at (max 30 days, cancel via /emails/{id}/cancel) instead of an app cron; a scheduled message has status "scheduled" and doesn't count as sent until the email.sent webhook arrives.
+- Mail threads link to contact enquiries via mail_threads.enquiry_id (auto-linked by matching email on send/receive); sending a linked email marks a "new" enquiry as replied.

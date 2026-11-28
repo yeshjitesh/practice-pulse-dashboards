@@ -70,16 +70,17 @@ export async function refreshThread(sb: Sb, threadId: string) {
     .select("id, direction, status, from_address, to_addresses, cc_addresses, text_body, html, subject, sent_at, mail_attachments(id)")
     .eq("thread_id", threadId).order("sent_at", { ascending: true });
   const list = messages ?? [];
-  const real = list.filter((m) => m.status !== "draft");
+  // Scheduled emails don't count as sent until Resend sends them.
+  const real = list.filter((m) => m.status !== "draft" && m.status !== "scheduled");
   const last = real[real.length - 1] ?? list[list.length - 1];
   const people = new Set<string>();
   for (const m of list) {
     for (const a of [m.from_address, ...m.to_addresses, ...m.cc_addresses]) if (a && a !== MAIL_FROM_ADDRESS) people.add(a);
   }
   await sb.from("mail_threads").update({
-    message_count: real.length,
     has_sent: real.some((m) => m.direction === "out"),
     has_draft: list.some((m) => m.status === "draft"),
+    message_count: list.filter((m) => m.status !== "draft").length,
     has_attachments: real.some((m) => (m.mail_attachments ?? []).length > 0),
     participants: [...people].join(", ").slice(0, 1000),
     ...(last ? { snippet: makeSnippet(last.text_body, last.html), last_message_at: last.sent_at } : {}),
@@ -155,15 +156,17 @@ export async function ingestInbound(emailId: string, eventData: ReceivedEmail) {
   const folder = thread?.folder;
   await sb.from("mail_threads").update({
     unread: true, follow_up_at: null,
-    ...(folder === "sent" || folder === "drafts" || folder === "archive" || folder === "bin" ? { folder: "inbox", binned_at: null } : {}),
+    ...(folder === "sent" || folder === "drafts" || folder === "archive" || folder === "bin" || folder === "snoozed"
+      ? { folder: "inbox", binned_at: null, snoozed_until: null, previous_folder: null } : {}),
   }).eq("id", threadId);
+  await autoLinkEnquiry(sb, threadId, [from.address]);
   await refreshThread(sb, threadId);
 }
 
 /** Record a delivery event for a sent email. Duplicate deliveries are ignored. */
 export async function recordDeliveryEvent(eventId: string, type: string, emailId: string, occurredAt: string | undefined, detail: string | null) {
   const sb = await db();
-  const { data: message } = await sb.from("mail_messages").select("id, status").eq("provider_id", emailId).maybeSingle();
+  const { data: message } = await sb.from("mail_messages").select("id, status, thread_id").eq("provider_id", emailId).maybeSingle();
   if (!message) return;
   const { error } = await sb.from("mail_events").insert({
     message_id: message.id, provider_event_id: eventId, type: type.replace("email.", ""),
@@ -171,7 +174,14 @@ export async function recordDeliveryEvent(eventId: string, type: string, emailId
   });
   if (error?.code === "23505") return;
   const status = nextStatus(message.status, type);
-  if (status !== message.status) await sb.from("mail_messages").update({ status }).eq("id", message.id);
+  if (status === message.status) return;
+  const wasScheduled = message.status === "scheduled";
+  await sb.from("mail_messages").update({ status, ...(wasScheduled ? { sent_at: occurredAt ? new Date(occurredAt).toISOString() : new Date().toISOString() } : {}) }).eq("id", message.id);
+  if (wasScheduled) {
+    await refreshThread(sb, message.thread_id);
+    const { data: t } = await sb.from("mail_threads").select("enquiry_id").eq("id", message.thread_id).single();
+    if (t?.enquiry_id) await sb.from("contact_submissions").update({ status: "replied" }).eq("id", t.enquiry_id).eq("status", "new");
+  }
 }
 
 /** Remove storage files belonging to the given threads. */
@@ -190,4 +200,26 @@ export async function purgeOldBin(sb: Sb) {
   if (!ids.length) return;
   await removeThreadFiles(sb, ids);
   await sb.from("mail_threads").delete().in("id", ids);
+}
+
+/** Return snoozed conversations whose time has come to where they were, marked unread. */
+export async function wakeSnoozed(sb: Sb) {
+  const { data } = await sb.from("mail_threads").select("id, previous_folder, custom_folder_id")
+    .eq("folder", "snoozed").lte("snoozed_until", new Date().toISOString()).limit(200);
+  for (const t of data ?? []) {
+    let folder = t.previous_folder && t.previous_folder !== "snoozed" && t.previous_folder !== "bin" ? t.previous_folder : "inbox";
+    if (folder === "custom" && !t.custom_folder_id) folder = "inbox";
+    await sb.from("mail_threads").update({ folder, previous_folder: null, snoozed_until: null, unread: true }).eq("id", t.id);
+  }
+}
+
+/** Link a conversation to the latest contact enquiry from one of these addresses, unless it's already linked. */
+export async function autoLinkEnquiry(sb: Sb, threadId: string, addresses: string[]) {
+  const list = [...new Set(addresses.map((a) => a.trim().toLowerCase()).filter((a) => a && a !== MAIL_FROM_ADDRESS))].slice(0, 20);
+  if (!list.length) return;
+  const { data: thread } = await sb.from("mail_threads").select("enquiry_id").eq("id", threadId).maybeSingle();
+  if (!thread || thread.enquiry_id) return;
+  const { data: enquiries } = await sb.from("contact_submissions").select("id, email").order("created_at", { ascending: false }).limit(500);
+  const match = (enquiries ?? []).find((e) => list.includes(e.email.trim().toLowerCase()));
+  if (match) await sb.from("mail_threads").update({ enquiry_id: match.id }).eq("id", threadId);
 }

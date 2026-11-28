@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   Inbox, Star, Send, FileText, Archive, ShieldAlert, Trash2, Folder, FolderPlus, Clock, Search, Paperclip, PenSquare, ArrowLeft,
   MailOpen, Mail as MailIcon, RotateCcw, MoreVertical, FolderInput, Reply, ReplyAll, Forward, RefreshCw, Loader2, Plug, X, Pencil, Bell, BellOff, ChevronDown,
+  AlarmClock, CalendarClock, Settings, Link2, Unlink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,15 +12,22 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { connectMailReceiving, getMailAttachmentUrl } from "@/lib/mail.functions";
-import { escapeHtml, forwardSubject, replySubject } from "@/lib/mail-utils";
-import { useMailbox, useThread, useMailSetup, useMailActions, timeLabel, formatBytes, type MailView, type MailThread, type MailMessage, type ThreadDetail } from "./api";
+import { escapeHtml, forwardSubject, replySubject, snoozeProblem } from "@/lib/mail-utils";
+import {
+  useMailbox, useThread, useMailSetup, useMailActions, useMailSettingsActions, timeLabel, whenLabel, formatBytes,
+  type MailView, type MailThread, type MailMessage, type ThreadDetail,
+} from "./api";
+import { TimeMenu } from "./TimeMenu";
+import { MailSettings } from "./MailSettings";
 import { Composer, type ComposeInit } from "./Composer";
 import { EmailFrame } from "./EmailFrame";
 
 const SYSTEM: { view: MailView; label: string; icon: typeof Inbox; drop?: string }[] = [
   { view: "inbox", label: "Inbox", icon: Inbox, drop: "inbox" },
   { view: "starred", label: "Starred", icon: Star },
+  { view: "snoozed", label: "Snoozed", icon: AlarmClock },
   { view: "followup", label: "Follow-up", icon: Clock },
+  { view: "scheduled", label: "Scheduled", icon: CalendarClock },
   { view: "sent", label: "Sent", icon: Send },
   { view: "drafts", label: "Drafts", icon: FileText },
   { view: "archive", label: "Archive", icon: Archive, drop: "archive" },
@@ -29,13 +37,18 @@ const SYSTEM: { view: MailView; label: string; icon: typeof Inbox; drop?: string
 
 const STATUS_STYLE: Record<string, string> = {
   sent: "bg-secondary text-foreground", delivered: "bg-sky text-foreground", opened: "bg-sage text-foreground", clicked: "bg-sage text-foreground",
-  bounced: "bg-destructive/15 text-destructive", complained: "bg-destructive/15 text-destructive", failed: "bg-destructive/15 text-destructive", draft: "bg-peach text-foreground",
+  bounced: "bg-destructive/15 text-destructive", complained: "bg-destructive/15 text-destructive", failed: "bg-destructive/15 text-destructive", draft: "bg-peach text-foreground", scheduled: "bg-peach text-foreground",
 };
-const STATUS_LABEL: Record<string, string> = { sent: "Sent", delivered: "Delivered", opened: "Opened", clicked: "Clicked", bounced: "Bounced", complained: "Spam complaint", failed: "Failed", draft: "Draft" };
+const STATUS_LABEL: Record<string, string> = { sent: "Sent", delivered: "Delivered", opened: "Opened", clicked: "Clicked", bounced: "Bounced", complained: "Spam complaint", failed: "Failed", draft: "Draft", scheduled: "Scheduled" };
 
 const DRAG_TYPE = "application/x-practicemd-threads";
 
-export function Mail() {
+/** Something another Admin section asked Mail to do, e.g. "email this enquiry". */
+export type MailIntent =
+  | { kind: "compose"; to: string; subject: string; enquiryId: string }
+  | { kind: "open"; threadId: string };
+
+export function Mail({ intent, onIntentDone, onOpenEnquiry }: { intent?: MailIntent | null; onIntentDone?: () => void; onOpenEnquiry?: (id: string) => void } = {}) {
   const [view, setView] = useState<MailView>("inbox");
   const [folderId, setFolderId] = useState<string | undefined>();
   const [searchInput, setSearchInput] = useState("");
@@ -45,6 +58,7 @@ export function Mail() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [cursor, setCursor] = useState(0);
   const [compose, setCompose] = useState<ComposeInit | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const composeKey = useRef(1);
   const qc = useQueryClient();
@@ -60,6 +74,20 @@ export function Mail() {
   const folders = box.data?.folders ?? [];
   const counts = box.data?.counts;
   const fromAddress = setup.data?.fromAddress ?? "hello@practicemd.uk";
+  const signature = setup.data?.signatureHtml ? `<p>--<br>${setup.data.signatureHtml}</p>` : "";
+
+  function newMessage(extra: { to?: string; subject?: string; enquiryId?: string } = {}) {
+    openCompose({ title: "New message", to: extra.to ?? "", cc: "", bcc: "", subject: extra.subject ?? "", html: `<p><br></p>${signature}`, ...(extra.enquiryId ? { enquiryId: extra.enquiryId } : {}) });
+  }
+
+  // Requests from other Admin sections (e.g. "Email" on an enquiry), handled once settings have loaded.
+  useEffect(() => {
+    if (!intent || setup.isLoading) return;
+    if (intent.kind === "compose") newMessage({ to: intent.to, subject: intent.subject, enquiryId: intent.enquiryId });
+    else { go("inbox"); setOpenId(intent.threadId); }
+    onIntentDone?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intent, setup.isLoading]);
 
   function go(next: MailView, id?: string) {
     setView(next); setFolderId(id); setSelected(new Set()); setOpenId(null); setCursor(0);
@@ -69,9 +97,9 @@ export function Mail() {
     setCompose({ ...partial, key: composeKey.current++ });
   }
 
-  async function run(action: Parameters<typeof actions.update>[0]["action"], ids: string[], extra: { folderId?: string; days?: number } = {}, message?: string) {
+  async function run(action: Parameters<typeof actions.update>[0]["action"], ids: string[], extra: { folderId?: string; days?: number; until?: string } = {}, message?: string) {
     if (!ids.length) return;
-    if (["archive", "spam", "bin", "move", "restore", "inbox"].includes(action)) {
+    if (["archive", "spam", "bin", "move", "restore", "inbox", "snooze", "unsnooze"].includes(action)) {
       // Close the conversation straight away so a later click isn't undone when the save finishes.
       setSelected(new Set());
       setOpenId((cur) => (cur && ids.includes(cur) ? null : cur));
@@ -107,7 +135,7 @@ export function Mail() {
     if (mode === "forward") {
       openCompose({
         title: "Forward", to: "", cc: "", bcc: "", subject: forwardSubject(detail.thread.subject),
-        html: `<p><br></p><p>---------- Forwarded message ---------<br>From: ${who}<br>Date: ${when}<br>Subject: ${escapeHtml(target.subject)}<br>To: ${escapeHtml(target.to_addresses.join(", "))}</p><blockquote>${quoted}</blockquote>`,
+        html: `<p><br></p>${signature}<p>---------- Forwarded message ---------<br>From: ${who}<br>Date: ${when}<br>Subject: ${escapeHtml(target.subject)}<br>To: ${escapeHtml(target.to_addresses.join(", "))}</p><blockquote>${quoted}</blockquote>`,
       });
       return;
     }
@@ -117,7 +145,7 @@ export function Mail() {
     openCompose({
       title: mode === "all" ? "Reply all" : "Reply", threadId: detail.thread.id,
       to: primary.join(", "), cc: [...new Set(others)].join(", "), bcc: "", subject: replySubject(detail.thread.subject),
-      html: `<p><br></p><p><br></p><p>On ${when}, ${who} wrote:</p><blockquote>${quoted}</blockquote>`,
+      html: `<p><br></p>${signature}<p><br></p><p>On ${when}, ${who} wrote:</p><blockquote>${quoted}</blockquote>`,
     });
   }
 
@@ -155,7 +183,7 @@ export function Mail() {
       if (compose && e.key !== "Escape") return;
       const current = threads[cursor];
       switch (e.key) {
-        case "c": e.preventDefault(); openCompose({ title: "New message", to: "", cc: "", bcc: "", subject: "", html: "" }); break;
+        case "c": e.preventDefault(); newMessage(); break;
         case "/": e.preventDefault(); searchRef.current?.focus(); break;
         case "j": setCursor((i) => Math.min(i + 1, Math.max(threads.length - 1, 0))); if (openId) { const n = threads[Math.min(cursor + 1, threads.length - 1)]; if (n) setOpenId(n.id); } break;
         case "k": setCursor((i) => Math.max(i - 1, 0)); if (openId) { const n = threads[Math.max(cursor - 1, 0)]; if (n) setOpenId(n.id); } break;
@@ -202,7 +230,7 @@ export function Mail() {
       <div className="grid min-h-[36rem] grid-cols-1 overflow-hidden rounded-xl border border-border bg-card md:h-[calc(100dvh-11rem)] xl:grid-cols-[13rem_22rem_minmax(0,1fr)] md:grid-cols-[19rem_minmax(0,1fr)]">
         {/* Folder sidebar (xl) */}
         <aside className="hidden flex-col gap-1 overflow-y-auto border-r border-border p-3 xl:flex">
-          <Button className="mb-2 justify-start rounded-2xl" onClick={() => openCompose({ title: "New message", to: "", cc: "", bcc: "", subject: "", html: "" })}><PenSquare /> Compose</Button>
+          <Button className="mb-2 justify-start rounded-2xl" onClick={() => newMessage()}><PenSquare /> Compose</Button>
           <nav aria-label="Mail folders" className="space-y-0.5">
             {SYSTEM.map((s) => (
               <FolderButton key={s.view} icon={s.icon} label={s.label} active={view === s.view} count={countFor(s.view, counts)}
@@ -281,11 +309,14 @@ export function Mail() {
                 <div className="flex shrink-0 items-center gap-0.5">
                   {inBin && threads.length > 0 && <Button size="sm" variant="ghost" onClick={emptyBin}>Empty Bin</Button>}
                   <IconAction label="Refresh" icon={box.isFetching ? Loader2 : RefreshCw} spin={box.isFetching} onClick={() => actions.refresh()} />
+                  <IconAction label="Mail settings" icon={Settings} onClick={() => setSettingsOpen(true)} />
                 </div>
               </div>
             )}
           </div>
           {inBin && <p className="border-b border-border bg-secondary/50 px-3 py-1.5 text-xs text-muted-foreground">Conversations in the Bin for more than 30 days are deleted automatically.</p>}
+          {view === "snoozed" && <p className="border-b border-border bg-secondary/50 px-3 py-1.5 text-xs text-muted-foreground">Snoozed conversations come back as unread at the time you chose, or sooner if someone replies.</p>}
+          {view === "scheduled" && <p className="border-b border-border bg-secondary/50 px-3 py-1.5 text-xs text-muted-foreground">Emails waiting to go out. Open one to cancel it and edit it as a draft.</p>}
           {view === "followup" && <p className="border-b border-border bg-secondary/50 px-3 py-1.5 text-xs text-muted-foreground">Sent emails that haven't had a reply by their reminder date.</p>}
           <ul className="min-h-0 flex-1 overflow-y-auto" aria-label="Conversations">
             {box.isLoading && <li className="p-6 text-center text-sm text-muted-foreground">Loading…</li>}
@@ -319,15 +350,18 @@ export function Mail() {
               onMove={(target) => moveTo(target, [thread.data!.thread.id])}
               onDeleteForever={() => deleteForever([thread.data!.thread.id])}
               onReply={(mode, m) => startReply(thread.data!, mode, m)}
+              {...(onOpenEnquiry ? { onOpenEnquiry } : {})}
               onOpenDraft={(m) => openDraft(m, thread.data!.thread.id)} />
           )}
         </div>
       </div>
 
-      <button type="button" onClick={() => openCompose({ title: "New message", to: "", cc: "", bcc: "", subject: "", html: "" })}
+      <button type="button" onClick={() => newMessage()}
         className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-2xl bg-primary px-5 py-3.5 text-sm font-medium text-primary-foreground shadow-lg xl:hidden">
         <PenSquare className="size-4" /> Compose
       </button>
+
+      <MailSettings open={settingsOpen} onOpenChange={setSettingsOpen} signatureHtml={setup.data?.signatureHtml ?? ""} />
 
       {compose && (
         <Composer key={compose.key} init={compose} fromAddress={fromAddress} onClose={() => setCompose(null)}
@@ -344,8 +378,9 @@ export function Mail() {
   }
 }
 
-function countFor(view: MailView, counts?: { inbox: number; drafts: number; followup: number; spam: number }) {
+function countFor(view: MailView, counts?: { inbox: number; drafts: number; followup: number; spam: number; scheduled: number }) {
   if (!counts) return 0;
+  if (view === "scheduled") return counts.scheduled;
   if (view === "inbox") return counts.inbox;
   if (view === "drafts") return counts.drafts;
   if (view === "followup") return counts.followup;
@@ -470,7 +505,9 @@ function ThreadRow({ thread: t, active, focused, checked, view, onToggle, onStar
           <span className={`min-w-0 flex-1 truncate ${t.unread ? "font-semibold text-foreground" : "text-foreground/80"}`}>{who}</span>
           {t.message_count > 1 && <span className="shrink-0 text-xs text-muted-foreground">{t.message_count}</span>}
           {t.has_attachments && <Paperclip className="size-3.5 shrink-0 text-muted-foreground" aria-label="Has attachment" />}
-          <span className={`shrink-0 text-xs ${t.unread ? "font-semibold text-foreground" : "text-muted-foreground"}`}>{timeLabel(t.last_message_at)}</span>
+          {view === "snoozed" && t.snoozed_until
+            ? <span className="shrink-0 text-xs text-accent">Until {timeLabel(t.snoozed_until)}</span>
+            : <span className={`shrink-0 text-xs ${t.unread ? "font-semibold text-foreground" : "text-muted-foreground"}`}>{timeLabel(t.last_message_at)}</span>}
         </div>
         <p className={`truncate ${t.unread ? "font-semibold" : ""}`}>
           {t.has_draft && <span className="mr-1 text-destructive">Draft</span>}
@@ -483,14 +520,16 @@ function ThreadRow({ thread: t, active, focused, checked, view, onToggle, onStar
   );
 }
 
-function Reader({ detail, folders, fromAddress, onBack, onAction, onMove, onDeleteForever, onReply, onOpenDraft }: {
+function Reader({ detail, folders, fromAddress, onBack, onAction, onMove, onDeleteForever, onReply, onOpenDraft, onOpenEnquiry }: {
   detail: ThreadDetail; folders: { id: string; name: string }[]; fromAddress: string;
   onBack: () => void;
-  onAction: (action: "unread" | "star" | "unstar" | "archive" | "spam" | "bin" | "restore" | "inbox" | "followup" | "clear_followup", extra?: { days?: number }, msg?: string) => void;
+  onAction: (action: "unread" | "star" | "unstar" | "archive" | "spam" | "bin" | "restore" | "inbox" | "followup" | "clear_followup" | "snooze" | "unsnooze", extra?: { days?: number; until?: string }, msg?: string) => void;
+  onOpenEnquiry?: (id: string) => void;
   onMove: (target: string) => void; onDeleteForever: () => void;
   onReply: (mode: "reply" | "all" | "forward", m?: MailMessage) => void; onOpenDraft: (m: MailMessage) => void;
 }) {
-  const { thread: t, messages } = detail;
+  const { thread: t, messages, enquiry, suggestions } = detail;
+  const settings = useMailSettingsActions();
   const real = messages.filter((m) => m.status !== "draft");
   const drafts = messages.filter((m) => m.status === "draft");
   const [expanded, setExpanded] = useState<Set<string>>(() => new Set(real.slice(-1).map((m) => m.id)));
@@ -517,6 +556,15 @@ function Reader({ detail, folders, fromAddress, onBack, onAction, onMove, onDele
         )}
         <IconAction label="Mark as unread" icon={MailIcon} onClick={() => { onAction("unread"); onBack(); }} />
         <MoveMenu folders={folders} onMove={onMove} />
+        {t.folder === "snoozed"
+          ? <IconAction label="Unsnooze" icon={AlarmClock} onClick={() => onAction("unsnooze", {}, "Unsnoozed")} />
+          : !inBin && t.folder !== "spam" && (
+            <TimeMenu label="Snooze" heading="Snooze until…" confirmLabel="Snooze" validate={(d) => snoozeProblem(d)}
+              onPick={(d) => onAction("snooze", { until: d.toISOString() }, `Snoozed until ${whenLabel(d)}`)}
+              triggerClassName="shrink-0 rounded-full p-2 text-muted-foreground hover:bg-secondary hover:text-foreground">
+              <AlarmClock className="size-4" />
+            </TimeMenu>
+          )}
         <DropdownMenu>
           <DropdownMenuTrigger title="Follow-up reminder" aria-label="Follow-up reminder" className="shrink-0 rounded-full p-2 text-muted-foreground hover:bg-secondary hover:text-foreground"><Bell className="size-4" /></DropdownMenuTrigger>
           <DropdownMenuContent align="start">
@@ -533,7 +581,27 @@ function Reader({ detail, folders, fromAddress, onBack, onAction, onMove, onDele
         <div className="mt-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
           <span className="rounded-full bg-secondary px-2 py-0.5 capitalize">{t.folder === "custom" ? (folders.find((f) => f.id === t.custom_folder_id)?.name ?? "Folder") : t.folder}</span>
           {followDue && <span className="rounded-full bg-mint px-2 py-0.5 text-foreground">Follow up {followDue <= new Date() ? "due now" : `on ${followDue.toLocaleDateString("en-GB", { day: "numeric", month: "short" })}`}</span>}
+          {t.folder === "snoozed" && t.snoozed_until && <span className="rounded-full bg-peach px-2 py-0.5 text-foreground">Snoozed until {whenLabel(new Date(t.snoozed_until))}</span>}
         </div>
+        {enquiry ? (
+          <div className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-border bg-mint/40 px-3 py-2 text-sm">
+            <span className="min-w-0 truncate"><span className="text-muted-foreground">Enquiry: </span><span className="font-medium">{enquiry.name}</span>
+              {enquiry.practice ? <span className="text-muted-foreground"> · {enquiry.practice}</span> : null} <span className="ml-1 rounded-full bg-card px-2 py-0.5 text-xs capitalize">{enquiry.status}</span></span>
+            <span className="flex shrink-0 items-center gap-1">
+              {onOpenEnquiry && <Button size="sm" variant="ghost" onClick={() => onOpenEnquiry(enquiry.id)}>View enquiry</Button>}
+              <IconAction label="Unlink enquiry" icon={Unlink} onClick={async () => { await settings.link(t.id, null); toast.success("Enquiry unlinked"); }} />
+            </span>
+          </div>
+        ) : suggestions.length > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-muted-foreground">Matching enquiry:</span>
+            {suggestions.map((e) => (
+              <Button key={e.id} size="sm" variant="outline" className="rounded-full" onClick={async () => { await settings.link(t.id, e.id); toast.success("Linked to the enquiry"); }}>
+                <Link2 /> Link {e.name} · {new Date(e.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+              </Button>
+            ))}
+          </div>
+        )}
         <div className="mt-4 space-y-3">
           {real.map((m) => (
             <MessageCard key={m.id} m={m} fromAddress={fromAddress} open={expanded.has(m.id)}
@@ -583,10 +651,12 @@ function MessageCard({ m, fromAddress, open, onToggle, onReply }: { m: MailMessa
         <span className="flex shrink-0 flex-col items-end gap-1">
           <span className="text-xs text-muted-foreground">{timeLabel(m.sent_at)}</span>
           {out && <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${STATUS_STYLE[m.status] ?? "bg-secondary"}`}>{STATUS_LABEL[m.status] ?? m.status}</span>}
+          {m.status === "scheduled" && m.scheduled_at && <span className="text-[11px] text-muted-foreground">{whenLabel(new Date(m.scheduled_at))}</span>}
         </span>
       </button>
       {open && (
         <div className="border-t border-border/60 px-4 py-4">
+          {m.status === "scheduled" && <ScheduledNotice m={m} />}
           <EmailFrame html={m.html} text={m.text_body} />
           {(m.mail_attachments ?? []).length > 0 && (
             <ul className="mt-4 flex flex-wrap gap-2">
@@ -626,5 +696,24 @@ function MessageCard({ m, fromAddress, open, onToggle, onReply }: { m: MailMessa
         </div>
       )}
     </article>
+  );
+}
+
+function ScheduledNotice({ m }: { m: MailMessage }) {
+  const settings = useMailSettingsActions();
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="mb-3 flex flex-col gap-2 rounded-lg bg-peach/60 px-3 py-2 text-sm sm:flex-row sm:items-center">
+      <CalendarClock className="size-4 shrink-0 text-primary" />
+      <span className="min-w-0 flex-1">Scheduled to send {m.scheduled_at ? whenLabel(new Date(m.scheduled_at)) : "later"}.</span>
+      <Button size="sm" variant="outline" disabled={busy} onClick={async () => {
+        setBusy(true);
+        try {
+          const r = await settings.cancelScheduled(m.id);
+          if (!r.ok) toast.error(r.error);
+          else toast.success(r.hadAttachments ? "Send cancelled — it's a draft again. Re-attach any files before sending." : "Send cancelled — it's a draft again.");
+        } finally { setBusy(false); }
+      }}>{busy && <Loader2 className="animate-spin" />} Cancel send</Button>
+    </div>
   );
 }

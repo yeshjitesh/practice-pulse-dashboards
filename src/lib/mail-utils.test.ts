@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createHmac } from "node:crypto";
-import { nextStatus, normalizeSubject, parseAddress, parseIdList } from "./mail-utils";
+import { nextStatus, normalizeSubject, parseAddress, parseIdList, scheduleProblem, snoozeProblem, textToHtml } from "./mail-utils";
 import { verifySvixSignature } from "./mail-signature";
 
 describe("thread matching", () => {
@@ -38,5 +38,25 @@ describe("webhook signature", () => {
     expect(verifySvixSignature({ id: "msg_1", timestamp: "1000", signature: sign("msg_1", "1000"), body: body + " ", secret, nowSeconds: 1010 })).toBe(false);
     expect(verifySvixSignature({ id: "msg_1", timestamp: "1000", signature: sign("msg_1", "1000"), body, secret, nowSeconds: 5000 })).toBe(false);
     expect(verifySvixSignature({ id: "msg_1", timestamp: "1000", signature: null, body, secret, nowSeconds: 1010 })).toBe(false);
+  });
+});
+
+describe("send later and snooze", () => {
+  const now = new Date("2026-11-28T12:00:00Z");
+  it("allows sending later between one minute and 30 days ahead", () => {
+    expect(scheduleProblem(new Date("2026-11-28T12:05:00Z"), now)).toBeNull();
+    expect(scheduleProblem(new Date("2026-12-27T12:00:00Z"), now)).toBeNull();
+    expect(scheduleProblem(new Date("2026-11-28T12:00:30Z"), now)).not.toBeNull();
+    expect(scheduleProblem(new Date("2026-12-29T12:00:00Z"), now)).not.toBeNull();
+  });
+  it("only snoozes into the future", () => {
+    expect(snoozeProblem(new Date("2026-11-29T08:00:00Z"), now)).toBeNull();
+    expect(snoozeProblem(new Date("2026-11-28T11:00:00Z"), now)).not.toBeNull();
+  });
+  it("a scheduled email becomes sent when Resend sends it", () => {
+    expect(nextStatus("scheduled", "email.sent")).toBe("sent");
+  });
+  it("signature text is escaped, never treated as HTML", () => {
+    expect(textToHtml("Yesh\n<b>PracticeMD</b>")).toBe("Yesh<br>&lt;b&gt;PracticeMD&lt;/b&gt;");
   });
 });
