@@ -157,6 +157,263 @@ export type Database = {
         }
         Relationships: []
       }
+      mail_attachments: {
+        Row: {
+          content_type: string
+          created_at: string
+          filename: string
+          id: string
+          message_id: string
+          provider_attachment_id: string | null
+          size: number
+          storage_path: string | null
+        }
+        Insert: {
+          content_type?: string
+          created_at?: string
+          filename?: string
+          id?: string
+          message_id: string
+          provider_attachment_id?: string | null
+          size?: number
+          storage_path?: string | null
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          filename?: string
+          id?: string
+          message_id?: string
+          provider_attachment_id?: string | null
+          size?: number
+          storage_path?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mail_attachments_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "mail_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mail_events: {
+        Row: {
+          detail: string | null
+          id: string
+          message_id: string | null
+          occurred_at: string
+          provider_event_id: string | null
+          type: string
+        }
+        Insert: {
+          detail?: string | null
+          id?: string
+          message_id?: string | null
+          occurred_at?: string
+          provider_event_id?: string | null
+          type: string
+        }
+        Update: {
+          detail?: string | null
+          id?: string
+          message_id?: string | null
+          occurred_at?: string
+          provider_event_id?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mail_events_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "mail_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mail_folders: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      mail_messages: {
+        Row: {
+          bcc_addresses: string[]
+          cc_addresses: string[]
+          created_at: string
+          direction: string
+          from_address: string
+          from_name: string
+          html: string | null
+          id: string
+          in_reply_to: string | null
+          message_id_header: string | null
+          provider_id: string | null
+          references_header: string | null
+          sent_at: string
+          status: string
+          subject: string
+          text_body: string | null
+          thread_id: string
+          to_addresses: string[]
+        }
+        Insert: {
+          bcc_addresses?: string[]
+          cc_addresses?: string[]
+          created_at?: string
+          direction?: string
+          from_address?: string
+          from_name?: string
+          html?: string | null
+          id?: string
+          in_reply_to?: string | null
+          message_id_header?: string | null
+          provider_id?: string | null
+          references_header?: string | null
+          sent_at?: string
+          status?: string
+          subject?: string
+          text_body?: string | null
+          thread_id: string
+          to_addresses?: string[]
+        }
+        Update: {
+          bcc_addresses?: string[]
+          cc_addresses?: string[]
+          created_at?: string
+          direction?: string
+          from_address?: string
+          from_name?: string
+          html?: string | null
+          id?: string
+          in_reply_to?: string | null
+          message_id_header?: string | null
+          provider_id?: string | null
+          references_header?: string | null
+          sent_at?: string
+          status?: string
+          subject?: string
+          text_body?: string | null
+          thread_id?: string
+          to_addresses?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mail_messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "mail_threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mail_settings: {
+        Row: {
+          id: number
+          updated_at: string
+          webhook_id: string | null
+          webhook_secret: string | null
+        }
+        Insert: {
+          id?: number
+          updated_at?: string
+          webhook_id?: string | null
+          webhook_secret?: string | null
+        }
+        Update: {
+          id?: number
+          updated_at?: string
+          webhook_id?: string | null
+          webhook_secret?: string | null
+        }
+        Relationships: []
+      }
+      mail_threads: {
+        Row: {
+          binned_at: string | null
+          created_at: string
+          custom_folder_id: string | null
+          folder: string
+          follow_up_at: string | null
+          has_attachments: boolean
+          has_draft: boolean
+          has_sent: boolean
+          id: string
+          last_message_at: string
+          message_count: number
+          normalized_subject: string
+          participants: string
+          previous_folder: string | null
+          snippet: string
+          starred: boolean
+          subject: string
+          unread: boolean
+        }
+        Insert: {
+          binned_at?: string | null
+          created_at?: string
+          custom_folder_id?: string | null
+          folder?: string
+          follow_up_at?: string | null
+          has_attachments?: boolean
+          has_draft?: boolean
+          has_sent?: boolean
+          id?: string
+          last_message_at?: string
+          message_count?: number
+          normalized_subject?: string
+          participants?: string
+          previous_folder?: string | null
+          snippet?: string
+          starred?: boolean
+          subject?: string
+          unread?: boolean
+        }
+        Update: {
+          binned_at?: string | null
+          created_at?: string
+          custom_folder_id?: string | null
+          folder?: string
+          follow_up_at?: string | null
+          has_attachments?: boolean
+          has_draft?: boolean
+          has_sent?: boolean
+          id?: string
+          last_message_at?: string
+          message_count?: number
+          normalized_subject?: string
+          participants?: string
+          previous_folder?: string | null
+          snippet?: string
+          starred?: boolean
+          subject?: string
+          unread?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mail_threads_custom_folder_id_fkey"
+            columns: ["custom_folder_id"]
+            isOneToOne: false
+            referencedRelation: "mail_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       testimonials: {
         Row: {
           author: string

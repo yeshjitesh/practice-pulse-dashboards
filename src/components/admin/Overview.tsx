@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { enquiryStats } from "@/lib/admin-insights";
 import { card, formatDate, StatusBadge, useAdminData } from "./shared";
 
-export type AdminTab = "overview" | "enquiries" | "chats" | "faqs" | "testimonials";
+export type AdminTab = "overview" | "mail" | "enquiries" | "chats" | "faqs" | "testimonials";
 
 export function Overview({ go }: { go: (tab: AdminTab) => void }) {
   const { data } = useAdminData();

@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { LayoutDashboard, Inbox, MessageCircle, HelpCircle, Quote, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Inbox, Mail as MailIcon, MessageCircle, HelpCircle, Quote, LogOut, ExternalLink } from "lucide-react";
 import { getAdminData, lockAdmin } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/brand/Logo";
@@ -10,6 +10,7 @@ import { useAdminData } from "@/components/admin/shared";
 import { Overview, type AdminTab } from "@/components/admin/Overview";
 import { Enquiries } from "@/components/admin/Enquiries";
 import { Chats, Faqs, Testimonials } from "@/components/admin/Content";
+import { Mail } from "@/components/admin/mail/Mail";
 
 export const Route = createFileRoute("/admin")({
   staticData: { sitemap: false },
@@ -17,7 +18,7 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Admin dashboard — PracticeMD" },
-      { name: "description", content: "Manage enquiries, chats and page content." },
+      { name: "description", content: "Manage mail, enquiries, chats and page content." },
       { property: "og:title", content: "Admin dashboard — PracticeMD" },
       { property: "og:description", content: "PracticeMD admin area." },
       { name: "robots", content: "noindex" },
@@ -39,6 +40,7 @@ function Admin() {
   const contactChats = (data?.chats ?? []).filter((c) => c.live_agent_requested).length;
   const nav: { id: AdminTab; label: string; icon: typeof Inbox; badge?: number }[] = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "mail", label: "Mail", icon: MailIcon },
     { id: "enquiries", label: "Enquiries", icon: Inbox, badge: newCount },
     { id: "chats", label: "Chats", icon: MessageCircle, badge: contactChats },
     { id: "faqs", label: "FAQs", icon: HelpCircle },
@@ -71,7 +73,7 @@ function Admin() {
           </div>
         </nav>
       </header>
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[14rem_minmax(0,1fr)] lg:px-10">
+      <div className={`mx-auto grid gap-8 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[14rem_minmax(0,1fr)] ${tab === "mail" ? "max-w-[110rem] lg:gap-5 lg:px-6" : "max-w-7xl lg:px-10"}`}>
         <aside className="hidden lg:block">
           <nav aria-label="Admin sections" className="sticky top-24 space-y-1">
             {nav.map((n) => <NavButton key={n.id} item={n} active={tab === n.id} onClick={() => go(n.id)} />)}
@@ -79,6 +81,7 @@ function Admin() {
         </aside>
         <main className="min-w-0">
           {tab === "overview" && <Overview go={go} />}
+          {tab === "mail" && <Mail />}
           {tab === "enquiries" && <Enquiries />}
           {tab === "chats" && <Chats />}
           {tab === "faqs" && <Faqs />}

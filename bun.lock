@@ -44,6 +44,7 @@
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
         "date-fns": "^4.1.0",
+        "dompurify": "^3.5.0",
         "embla-carousel-react": "^8.6.0",
         "input-otp": "^1.4.2",
         "lucide-react": "^0.575.0",
@@ -616,6 +617,8 @@
 
     "@types/react-dom": ["@types/react-dom@19.2.3", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@types/react-dom/-/react-dom-19.2.3.tgz", { "peerDependencies": { "@types/react": "^19.2.0" } }, "sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ=="],
 
+    "@types/trusted-types": ["@types/trusted-types@2.0.7", "", {}, "sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw=="],
+
     "@types/unist": ["@types/unist@3.0.3", "", {}, "sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q=="],
 
     "@typescript-eslint/eslint-plugin": ["@typescript-eslint/eslint-plugin@8.65.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@typescript-eslint/eslint-plugin/-/eslint-plugin-8.65.0.tgz", { "dependencies": { "@eslint-community/regexpp": "^4.12.2", "@typescript-eslint/scope-manager": "8.65.0", "@typescript-eslint/type-utils": "8.65.0", "@typescript-eslint/utils": "8.65.0", "@typescript-eslint/visitor-keys": "8.65.0", "ignore": "^7.0.5", "natural-compare": "^1.4.0", "ts-api-utils": "^2.5.0" }, "peerDependencies": { "@typescript-eslint/parser": "^8.65.0", "eslint": "^8.57.0 || ^9.0.0 || ^10.0.0", "typescript": ">=4.8.4 <6.1.0" } }, "sha512-IEgob78X12rHpUmtcwFsXhZdVGJtwTVP8FiCLZkR6GlYVrl2PcuB+KhCE5BlVC/eQpQnu8WXRtkHZuPar+gCRA=="],
@@ -823,6 +826,8 @@
     "dom-helpers": ["dom-helpers@5.2.1", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/dom-helpers/-/dom-helpers-5.2.1.tgz", { "dependencies": { "@babel/runtime": "^7.8.7", "csstype": "^3.0.2" } }, "sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA=="],
 
     "domexception": ["domexception@4.0.0", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/domexception/-/domexception-4.0.0.tgz", { "dependencies": { "webidl-conversions": "^7.0.0" } }, "sha512-A2is4PLG+eeSfoTMA95/s4pvAoSo2mKtiM5jlHkAVewmiO8ISFTFKZjH7UAM1Atli/OT/7JHOrJRJiMKUZKYBw=="],
+
+    "dompurify": ["dompurify@3.5.0", "", { "optionalDependencies": { "@types/trusted-types": "^2.0.7" } }, "sha512-LYC0ZkE8P1V42JsRYTwMdme/2ET8SpOc5AA2eOFjP/IadvRd2fwiT4TVz5vkfy0XUx12aS2UaRkTnfVPNOv9vw=="],
 
     "drizzle-kit": ["drizzle-kit@0.31.11", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/drizzle-kit/-/drizzle-kit-0.31.11.tgz", { "dependencies": { "@drizzle-team/brocli": "^0.10.2", "@esbuild-kit/esm-loader": "^2.5.5", "esbuild": "^0.25.4", "tsx": "^4.21.0" }, "bin": { "drizzle-kit": "bin.cjs" } }, "sha512-YCYqxTLIB2OCqf6w9/Vef13baBVbwQIPcbT4Y56AfO6B9ajZhDhD8Jkveg/hJvT/iuMloKD/IYYkyMMNhr7Kqg=="],
 

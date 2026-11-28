@@ -43,6 +43,13 @@
       "when": 1795601268263,
       "tag": "0005_harden_role_check_and_public_content",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795882369039,
+      "tag": "0006_create_mail",
+      "breakpoints": true
     }
   ]
 }

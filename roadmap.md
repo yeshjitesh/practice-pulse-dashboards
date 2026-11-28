@@ -1,15 +1,5 @@
-# Homepage clarity
-- [x] Clarify practice-provided reports across public pages, add import artwork and sample-only demo imports.
-- [x] Verify sample import, contact navigation and phone layouts; reported hook error not reproduced, current build passes.
-- [x] Simplify the homepage journey while retaining the original brand and drawings.
-- [x] Improve phone navigation and demo preview accessibility.
-- [x] Verify homepage, demo switches and contact navigation on desktop and phone; check the reported error (not reproduced; current build succeeds).
+# Roadmap
 
-# Admin access code
-- [x] Replace account signup with a server-checked access code and encrypted session.
-- [x] Protect all admin reads and changes, retire first-signup admin assignment, and verify unlock/relock and FAQ create/edit/delete.
-- [x] Recheck the reported mobile hook error: not reproduced; current build succeeds.
-# Admin dashboard
-- [x] Overview with enquiry/chat/FAQ counts and latest enquiries.
-- [x] Contact enquiries: search, status filter, add, edit, status change, delete, reply, CSV export.
-- [x] Chats, FAQs and testimonials manage screens; verified on desktop and phone.
+## Mail (Admin)
+- [x] Phase 1: Gmail-style inbox with Resend sending, receiving, threads, folders, Bin, follow-up and tracking
+- [ ] Phase 2 (waiting on owner go-ahead): snooze and send later, email signatures and reply templates, link threads to Enquiries

@@ -24,6 +24,7 @@ import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ApiPublicResendWebhookRouteImport } from './routes/api/public/resend-webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -100,6 +101,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicResendWebhookRoute = ApiPublicResendWebhookRouteImport.update({
+  id: '/api/public/resend-webhook',
+  path: '/api/public/resend-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -117,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/api/public/resend-webhook': typeof ApiPublicResendWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/api/public/resend-webhook': typeof ApiPublicResendWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,6 +160,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/api/public/resend-webhook': typeof ApiPublicResendWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/api/public/resend-webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/api/public/resend-webhook'
   id:
     | '__root__'
     | '/'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/api/public/resend-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -223,6 +235,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ApiPublicResendWebhookRoute: typeof ApiPublicResendWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -332,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/resend-webhook': {
+      id: '/api/public/resend-webhook'
+      path: '/api/public/resend-webhook'
+      fullPath: '/api/public/resend-webhook'
+      preLoaderRoute: typeof ApiPublicResendWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -351,6 +371,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ApiPublicResendWebhookRoute: ApiPublicResendWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

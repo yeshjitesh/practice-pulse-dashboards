@@ -19,3 +19,8 @@
 
 - Demo report imports use shared synthetic fixtures and a client-only one-second simulation; no file picker or upload endpoint is exposed — keeps marketing demos separate from real clinical data handling.
 - Import-workflow FAQs are composed identically into public FAQ views and their structured data — keeps visible answers and search metadata consistent without changing admin-managed content.
+- Admin Mail (src/components/admin/mail/) uses Resend via the connector gateway; all Resend calls live in src/lib/mail.server.ts and every mail server function calls requireAdmin() first — keeps the inbox behind the admin gate.
+- Mail tables (mail_*) and the mail-attachments bucket have RLS on with no policies and only service_role grants — mail is never readable from browser clients.
+- Inbound mail and delivery events arrive at /api/public/resend-webhook, verified with the Svix signature against the signing secret stored in mail_settings (written by "Turn on incoming mail") — no manual secret copy needed.
+- Email HTML is shown only via EmailFrame (DOMPurify + sandboxed iframe without scripts + CSP blocking remote images until allowed) — never render email HTML directly in the admin page.
+- Bin purge (30 days) runs lazily when the mailbox loads and Follow-up is a date query, not a cron job — avoids scheduled compute for a single-admin inbox.
