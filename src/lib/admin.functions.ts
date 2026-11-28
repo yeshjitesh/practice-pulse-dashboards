@@ -4,13 +4,43 @@ import { z } from "zod";
 export const unlockAdmin = createServerFn({ method: "POST" })
   .inputValidator((input: { code: string }) => z.object({ code: z.string().min(1).max(256) }).parse(input))
   .handler(async ({ data }) => {
-    const { adminSession, passwordMatches } = await import("./admin-gate.server");
+    const g = await import("./admin-gate.server");
     const expected = process.env["SITE_PASSWORD"];
-    if (!expected) throw new Error("Admin access is not configured.");
-    const session = await adminSession();
-    if (!passwordMatches(data.code, expected)) return { ok: false };
-    await session.update({ unlocked: true });
-    return { ok: true };
+    const secret = process.env["SESSION_SECRET"];
+    if (!expected || !secret) throw new Error("Admin access is not configured.");
+    const session = await g.adminSession();
+    if (!g.passwordMatches(data.code, expected)) return { ok: false as const };
+    const otp = g.newOtp();
+    await session.update({ unlocked: false, otpHash: g.hashOtp(otp, secret), otpExpires: Date.now() + g.OTP_TTL_MS, otpAttempts: 0 });
+    const { resend, MAIL_FROM_ADDRESS, MAIL_FROM_NAME } = await import("./mail.server");
+    const { brandEmail } = await import("./email-brand");
+    try {
+      await resend("/emails", { method: "POST", body: {
+        from: `${MAIL_FROM_NAME} <${MAIL_FROM_ADDRESS}>`, to: [g.ADMIN_OTP_EMAIL],
+        subject: `Your PracticeMD admin code: ${otp}`,
+        html: brandEmail(`<p style="font-family:Arial,sans-serif;font-size:16px;color:#283338">Your admin sign-in code is:</p><p style="font-family:Arial,sans-serif;font-size:32px;letter-spacing:8px;font-weight:bold;color:#0B5D4E">${otp}</p><p style="font-family:Arial,sans-serif;font-size:14px;color:#283338">It expires in 10 minutes. If you didn't try to sign in, someone has your access code — change it.</p>`, "Your admin sign-in code"),
+        text: `Your PracticeMD admin code is ${otp}. It expires in 10 minutes.`,
+      } });
+    } catch (e) {
+      console.error("Admin OTP email failed", e);
+      await session.clear();
+      throw new Error("Couldn't send the sign-in code.");
+    }
+    return { ok: true as const, otpSent: true };
+  });
+
+export const verifyAdminOtp = createServerFn({ method: "POST" })
+  .inputValidator((input: { code: string }) => z.object({ code: z.string().trim().regex(/^\d{6}$/) }).parse(input))
+  .handler(async ({ data }) => {
+    const g = await import("./admin-gate.server");
+    const secret = process.env["SESSION_SECRET"];
+    if (!secret) throw new Error("Admin access is not configured.");
+    const session = await g.adminSession();
+    const result = g.checkOtp(session.data, data.code, secret, Date.now());
+    if (result === "ok") { await session.update({ unlocked: true, otpHash: undefined, otpExpires: undefined, otpAttempts: undefined }); return { ok: true as const }; }
+    if (result === "wrong") await session.update({ otpAttempts: (session.data.otpAttempts ?? 0) + 1 });
+    else await session.clear();
+    return { ok: false as const, reason: result };
   });
 
 export const lockAdmin = createServerFn({ method: "POST" }).handler(async () => {

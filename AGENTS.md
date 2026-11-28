@@ -9,7 +9,7 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 - Brand logo lives in src/components/brand/Logo.tsx (SVG using theme tokens); favicons/app icons in public/ are rendered from public/favicon.svg — keeps the brand in one place.
-- Admin area uses a server-validated shared-code gate and encrypted HttpOnly session; every read and mutation verifies the gate before privileged access, and signup never grants admin privileges. Public page content uses a publishable-key server function — keeps private records off public clients.
+- Admin area uses a server-validated shared-code gate plus a 6-digit emailed code (hashed in the encrypted session, 10-min expiry, 5 tries) and encrypted HttpOnly session; every read and mutation verifies the gate before privileged access, and signup never grants admin privileges. Public page content uses a publishable-key server function — keeps private records off public clients.
 - Sitemap is router-derived (src/lib/sitemap.ts + src/routes/sitemap[.]xml.ts); every route must set staticData.sitemap — keeps search listings in sync with pages.
 - src/design/ holds the uploaded style reference (tokens.json, variables.css, theme_1.css, style-reference.md) as source material only; live tokens are in src/styles.css and DESIGN.md — keeps one source of truth for the running site.
 - Public marketing pages share SiteShell (header/footer), pageHead() and breadcrumb() from src/components/site/shared.tsx and reusable sections from sections.tsx — each section page is its own route so it gets its own SEO head and sitemap entry.

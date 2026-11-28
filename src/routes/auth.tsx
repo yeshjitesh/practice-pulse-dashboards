@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { unlockAdmin } from "@/lib/admin.functions";
+import { unlockAdmin, verifyAdminOtp } from "@/lib/admin.functions";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { LockKeyhole } from "lucide-react";
@@ -23,6 +23,8 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const unlock = useServerFn(unlockAdmin);
+  const verify = useServerFn(verifyAdminOtp);
+  const [step, setStep] = useState<"code" | "otp">("code");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
   async function submit(e: FormEvent<HTMLFormElement>) {
@@ -30,10 +32,18 @@ function AuthPage() {
     const code = String(new FormData(e.currentTarget).get("code") ?? "");
     setMsg(""); setBusy(true);
     try {
-      const result = await unlock({ data: { code } });
-      if (result.ok) await navigate({ to: "/admin", replace: true });
-      else setMsg("Incorrect access code.");
-    } catch { setMsg("Couldn't unlock the admin area. Please try again."); }
+      if (step === "code") {
+        const result = await unlock({ data: { code } });
+        if (result.ok) { setStep("otp"); }
+        else setMsg("Incorrect access code.");
+      } else {
+        if (!/^\d{6}$/.test(code.trim())) { setMsg("Enter the 6-digit code."); return; }
+        const result = await verify({ data: { code: code.trim() } });
+        if (result.ok) await navigate({ to: "/admin", replace: true });
+        else if (result.reason === "wrong") setMsg("That code isn't right. Please try again.");
+        else { setStep("code"); setMsg(result.reason === "locked" ? "Too many tries. Please start again." : "That code has expired. Please start again."); }
+      }
+    } catch { setMsg(step === "code" ? "Couldn't send the sign-in code. Please try again." : "Couldn't check the code. Please try again."); }
     finally { setBusy(false); }
   }
   return (
@@ -42,11 +52,18 @@ function AuthPage() {
         <Link to="/"><Logo /></Link>
         <LockKeyhole className="mt-8 size-6 text-primary" />
         <h1 className="mt-3 font-display text-3xl text-primary">Admin access</h1>
-        <form onSubmit={submit} className="mt-6 space-y-4">
-          <label htmlFor="access-code" className="block text-sm font-medium">Access code</label>
-          <input id="access-code" name="code" type="password" required maxLength={256} autoComplete="current-password" className="w-full rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-accent focus:ring-2 focus:ring-ring/30" />
+        <form key={step} onSubmit={submit} className="mt-6 space-y-4">
+          {step === "code" ? (<>
+            <label htmlFor="access-code" className="block text-sm font-medium">Access code</label>
+            <input id="access-code" name="code" type="password" required maxLength={256} autoComplete="current-password" className="w-full rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-accent focus:ring-2 focus:ring-ring/30" />
+          </>) : (<>
+            <p className="text-sm text-muted-foreground">We've emailed a 6-digit code to the admin inbox. It expires in 10 minutes.</p>
+            <label htmlFor="otp-code" className="block text-sm font-medium">Email code</label>
+            <input id="otp-code" name="code" type="text" inputMode="numeric" pattern="[0-9]{6}" required maxLength={6} autoComplete="one-time-code" autoFocus className="w-full rounded-lg border border-input bg-background px-4 py-3 text-center text-2xl tracking-[0.4em] outline-none focus:border-accent focus:ring-2 focus:ring-ring/30" />
+          </>)}
           {msg && <p role="alert" className="text-sm text-destructive">{msg}</p>}
-          <Button type="submit" variant="brand" disabled={busy} className="h-12 w-full">{busy ? "Please wait…" : "Unlock admin"}</Button>
+          <Button type="submit" variant="brand" disabled={busy} className="h-12 w-full">{busy ? "Please wait…" : step === "code" ? "Continue" : "Verify and sign in"}</Button>
+          {step === "otp" && <Button type="button" variant="link" className="px-0" onClick={() => { setStep("code"); setMsg(""); }}>Start again / resend code</Button>}
         </form>
         <Button asChild variant="link" className="mt-4 px-0"><Link to="/">Back to PracticeMD</Link></Button>
       </div>
